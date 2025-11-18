@@ -1,27 +1,131 @@
+// src/pages/Login.jsx
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../services/api";
+
 export default function Login() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ email: "", password: "", role: "Student" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    
+    try {
+      const res = await login(form);
+      if (!res || !res.token) throw new Error("Invalid response");
+      
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("user", JSON.stringify(res.user));
+      
+      if (res.user.role === "Student") navigate("/student/dashboard");
+      else navigate("/teacher/dashboard");
+    } catch (err) {
+      setError(err.message || "Login failed. Please check your credentials.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="grid grid-cols-2 h-screen">
-      <div className="bg-orange-200"></div>
+    <div className="min-h-screen flex">
+      {/* Left Side - Illustration */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-orange-900 via-orange-800 to-orange-700 items-center justify-center p-12">
+        <div className="max-w-md text-white space-y-6">
+          <div className="w-full h-96 bg-gradient-to-br from-orange-700 to-orange-600 rounded-lg flex items-center justify-center">
+            {/* Placeholder for illustration - replace with actual image */}
+            <svg className="w-64 h-64 text-orange-300" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+            </svg>
+          </div>
+          <h2 className="text-3xl font-bold">Smart Assignment System</h2>
+          <p className="text-orange-100">Manage assignments and track student progress efficiently</p>
+        </div>
+      </div>
 
-      <div className="flex items-center justify-center bg-gray-50">
-        <div className="w-96">
-          <h1 className="text-3xl font-bold mb-6">Welcome Back</h1>
+      {/* Right Side - Login Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
+        <div className="w-full max-w-md space-y-8">
+          <div className="text-center">
+            <h2 className="text-4xl font-bold text-gray-900">Welcome Back</h2>
+            <p className="mt-2 text-gray-600">Log in to manage your assignments.</p>
+          </div>
 
-          <input className="w-full border p-3 rounded mb-4" placeholder="Email" />
-          <input className="w-full border p-3 rounded mb-4" placeholder="Password" type="password" />
+          <form onSubmit={handleLogin} className="mt-8 space-y-6 bg-white p-8 rounded-xl shadow-sm">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
 
-          <select className="w-full border p-3 rounded mb-6">
-            <option>Student</option>
-            <option>Teacher</option>
-          </select>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={form.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                placeholder="you@example.com"
+              />
+            </div>
 
-          <button className="w-full bg-blue-600 text-white p-3 rounded-lg">
-            Log In
-          </button>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={form.password}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                placeholder="Enter your password"
+              />
+            </div>
 
-          <p className="mt-4 text-center">
-            Don't have an account? <a href="/register" className="text-blue-600">Register</a>
-          </p>
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
+                Select Your Role
+              </label>
+              <select
+                id="role"
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-white"
+              >
+                <option value="Student">Student</option>
+                <option value="Teacher">Teacher</option>
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Logging in..." : "Log In"}
+            </button>
+
+            <p className="text-center text-sm text-gray-600">
+              Don't have an account?{" "}
+              <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+                Register
+              </Link>
+            </p>
+          </form>
         </div>
       </div>
     </div>

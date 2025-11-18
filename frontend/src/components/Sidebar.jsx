@@ -1,13 +1,18 @@
+// src/components/Sidebar.jsx
+import React from "react";
+import { Link } from "react-router-dom";
+
 export default function Sidebar() {
   return (
-    <div className="w-64 bg-white h-screen shadow-md p-6">
-      <h2 className="text-lg font-bold mb-6">Student Role</h2>
-
-      <ul className="space-y-4">
-        <li><a href="/student/dashboard" className="hover:text-blue-600">Assignments</a></li>
-        <li><a href="/student/submissions" className="hover:text-blue-600">My Submissions</a></li>
-        <li><a href="/profile" className="hover:text-blue-600">Profile</a></li>
-      </ul>
-    </div>
+    <aside className="w-64 pr-6">
+      <div className="bg-white rounded-lg p-4 shadow-sm">
+        <div className="text-lg font-semibold mb-4">AMS</div>
+        <ul className="space-y-2 text-gray-700">
+          <li><Link to="/teacher/dashboard" className="block py-2">Dashboard</Link></li>
+          <li><Link to="/teacher/analytics" className="block py-2">Analytics</Link></li>
+          <li><Link to="/teacher/feedback/1" className="block py-2">Feedback</Link></li>
+        </ul>
+      </div>
+    </aside>
   );
 }

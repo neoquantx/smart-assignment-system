@@ -1,3 +1,12 @@
+/* src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* small theme tokens to match screenshots */
+:root{
+  --accent: #FDD9B1;
+  --primary: #2B6CE4;
+  --card: #ffffff;
+}
+body { @apply antialiased; }
