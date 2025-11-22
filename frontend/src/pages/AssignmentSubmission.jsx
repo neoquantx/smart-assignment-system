@@ -12,6 +12,7 @@ export default function AssignmentSubmission() {
 
   const [assignment, setAssignment] = useState(null);
   const [file, setFile] = useState(null);
+  const [filePreviewUrl, setFilePreviewUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -70,6 +71,14 @@ export default function AssignmentSubmission() {
       }
 
       setFile(selectedFile);
+      // create preview for PDF
+      if (selectedFile && selectedFile.type === 'application/pdf') {
+        if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
+        const url = URL.createObjectURL(selectedFile);
+        setFilePreviewUrl(url);
+      } else {
+        setFilePreviewUrl(null);
+      }
       setUploadSuccess(true);
       setTimeout(() => setUploadSuccess(false), 3000);
     }
@@ -81,9 +90,19 @@ export default function AssignmentSubmission() {
     }
   };
 
+  useEffect(() => {
+    return () => {
+      if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
+    };
+  }, [filePreviewUrl]);
+
   const removeFile = () => {
     setFile(null);
     setUploadSuccess(false);
+    if (filePreviewUrl) {
+      URL.revokeObjectURL(filePreviewUrl);
+      setFilePreviewUrl(null);
+    }
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -237,7 +256,7 @@ export default function AssignmentSubmission() {
 
             {/* File Preview */}
             {file && (
-              <div className="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between mb-6">
+              <div className="bg-white border border-gray-200 rounded-lg p-4 flex items-start gap-4 mb-6">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-blue-100 rounded flex items-center justify-center">
                     <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -260,6 +279,11 @@ export default function AssignmentSubmission() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
                   </svg>
                 </button>
+                {filePreviewUrl && (
+                  <div className="w-full mt-4">
+                    <iframe src={filePreviewUrl} title="Preview" className="w-full h-[480px] border-none rounded-lg" />
+                  </div>
+                )}
               </div>
             )}
 

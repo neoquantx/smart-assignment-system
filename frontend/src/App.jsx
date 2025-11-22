@@ -8,7 +8,10 @@ const Register = lazy(() => import("./pages/Register.jsx"));
 const StudentDashboard = lazy(() => import("./pages/StudentDashboard.jsx"));
 const StudentSubmissions = lazy(() => import("./pages/StudentSubmissions.jsx"));
 const AssignmentSubmission = lazy(() => import("./pages/AssignmentSubmission.jsx"));
+const StudentFeedback = lazy(() => import("./pages/StudentFeedback.jsx"));
 const TeacherDashboard = lazy(() => import("./pages/TeacherDashboard.jsx"));
+const StudentProfile = lazy(() => import("./pages/StudentProfile.jsx"));
+const TeacherProfile = lazy(() => import("./pages/TeacherProfile.jsx"));
 const FeedbackPage = lazy(() => import("./pages/FeedbackPage.jsx"));
 const Analytics = lazy(() => import("./pages/Analytics.jsx"));
 
@@ -25,10 +28,13 @@ export default function App() {
           <Route path="/student/dashboard" element={<StudentDashboard />} />
           <Route path="/student/submissions" element={<StudentSubmissions />} />
           <Route path="/student/submit/:id" element={<AssignmentSubmission />} />
-          <Route path="/student/profile" element={<div className="p-8">Profile - Coming Soon</div>} />
+          <Route path="/student/feedback/:id" element={<StudentFeedback />} />
+
+          <Route path="/student/profile" element={<StudentProfile />} />
 
           {/* Teacher Routes */}
           <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
+          <Route path="/teacher/profile" element={<TeacherProfile />} />
           <Route path="/teacher/feedback/:id" element={<FeedbackPage />} />
           <Route path="/teacher/analytics" element={<Analytics />} />
 

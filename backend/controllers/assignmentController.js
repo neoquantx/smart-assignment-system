@@ -14,8 +14,8 @@ export const getAssignment = async (req, res) => {
 
 export const createAssignment = async (req, res) => {
   try {
-    const { title, description, deadline } = req.body;
-    const a = await Assignment.create({ title, description, deadline, createdBy: req.user._id });
+    const { title, description, deadline, maxMarks } = req.body;
+    const a = await Assignment.create({ title, description, deadline, maxMarks: maxMarks || 100, createdBy: req.user._id });
     res.status(201).json(a);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };

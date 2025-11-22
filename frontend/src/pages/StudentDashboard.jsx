@@ -1,15 +1,20 @@
 // src/pages/StudentDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { getAssignments } from "../services/api";
+import { getAssignments, getSubmissions, getUsers } from "../services/api";
 import StudentLayout from "../components/StudentLayout";
 import Loading from "../components/Loading";
 import EmptyState from "../components/EmptyState";
+import Chat from "../components/Chat";
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
   const [assignments, setAssignments] = useState([]);
+  const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [chatWithUser, setChatWithUser] = useState(null);
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const [teachers, setTeachers] = useState([]);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -19,9 +24,17 @@ export default function StudentDashboard() {
     }
 
     setLoading(true);
-    getAssignments()
-      .then((res) => setAssignments(res || []))
-      .catch(() => setAssignments([]))
+    Promise.all([getAssignments(), getSubmissions(), getUsers("Teacher")])
+      .then(([assignRes, subRes, teacherRes]) => {
+        setAssignments(assignRes || []);
+        setSubmissions(subRes || []);
+        setTeachers(teacherRes || []);
+      })
+      .catch(() => {
+        setAssignments([]);
+        setSubmissions([]);
+        setTeachers([]);
+      })
       .finally(() => setLoading(false));
   }, [navigate]);
 
@@ -74,16 +87,60 @@ export default function StudentDashboard() {
                   <span>Due: {formatDate(assignment.deadline)}</span>
                 </div>
 
-                <Link
-                  to={`/student/submit/${assignment._id || assignment.id}`}
-                  className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center font-medium py-2 px-4 rounded-lg transition"
-                >
-                  View / Submit
-                </Link>
+                {(() => {
+                  const hasSubmitted = submissions.some(s => String(s.assignment?._id || s.assignment) === String(assignment._id || assignment.id));
+                  if (hasSubmitted) {
+                    return (
+                      <Link
+                        to="/student/submissions"
+                        className="block w-full bg-green-100 text-green-800 text-center font-medium py-2 px-4 rounded-lg transition"
+                      >
+                        View Submission
+                      </Link>
+                    );
+                  }
+
+                  return (
+                    <Link
+                      to={`/student/submit/${assignment._id || assignment.id}`}
+                      className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center font-medium py-2 px-4 rounded-lg transition"
+                    >
+                      View / Submit
+                    </Link>
+                  );
+                })()}
               </div>
             ))}
           </div>
         )}
+      </div>
+
+      {/* Chat Section */}
+      <div className="p-8 border-t border-gray-200">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Chat with Teachers</h2>
+        <div className="flex gap-4">
+          <div className="w-1/3">
+            <h3 className="text-lg font-semibold mb-2">Select a Teacher</h3>
+            <div className="space-y-2">
+              {teachers.map((teacher) => (
+                <button
+                  key={teacher.id}
+                  onClick={() => setChatWithUser(teacher)}
+                  className={`w-full text-left p-3 rounded-lg border ${
+                    chatWithUser?.id === teacher.id
+                      ? "bg-blue-100 border-blue-300"
+                      : "bg-white border-gray-200 hover:bg-gray-50"
+                  }`}
+                >
+                  {teacher.name}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="w-2/3">
+            <Chat currentUser={user} chatWithUser={chatWithUser} />
+          </div>
+        </div>
       </div>
     </StudentLayout>
   );

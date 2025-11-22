@@ -7,11 +7,20 @@ export const listSubmissions = async (req, res) => {
   if (req.user && req.user.role === "Teacher") {
     const all = await Submission.find().populate("assignment student");
     // attach quick fields
-    const shaped = all.map(s => ({ ...s.toObject(), assignmentTitle: s.assignment?.title, studentName: s.student?.name }));
+    const shaped = all.map(s => ({
+      ...s.toObject(),
+      assignmentTitle: s.assignment?.title,
+      assignmentMaxMarks: s.assignment?.maxMarks || 100,
+      studentName: s.student?.name
+    }));
     return res.json(shaped);
   } else {
     const mine = await Submission.find({ student: req.user._id }).populate("assignment");
-    const shaped = mine.map(s => ({ ...s.toObject(), assignmentTitle: s.assignment?.title }));
+    const shaped = mine.map(s => ({
+      ...s.toObject(),
+      assignmentTitle: s.assignment?.title,
+      assignmentMaxMarks: s.assignment?.maxMarks || 100
+    }));
     return res.json(shaped);
   }
 };

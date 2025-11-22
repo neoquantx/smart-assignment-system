@@ -1,11 +1,14 @@
 // src/pages/TeacherDashboard.jsx
 import React, { useEffect, useState } from "react";
-import { getAssignments, getSubmissions, createAssignment } from "../services/api";
-import { useNavigate, Link } from "react-router-dom";
+import { getAssignments, getSubmissions, createAssignment, postFeedback, getUsers } from "../services/api";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Chat from "../components/Chat";
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "null");
+  const location = useLocation();
 
   const [assignments, setAssignments] = useState([]);
   const [submissions, setSubmissions] = useState([]);
@@ -17,8 +20,18 @@ export default function TeacherDashboard() {
   const [newAssignment, setNewAssignment] = useState({
     title: "",
     description: "",
-    deadline: ""
+    deadline: "",
+    maxMarks: 100
   });
+
+  const [showGradeModal, setShowGradeModal] = useState(false);
+  const [selectedSubmission, setSelectedSubmission] = useState(null);
+  const [marks, setMarks] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [chatWithUser, setChatWithUser] = useState(null);
+
+  const [students, setStudents] = useState([]);
 
   useEffect(() => {
     if (!user) {
@@ -29,19 +42,29 @@ export default function TeacherDashboard() {
       navigate("/student/dashboard");
       return;
     }
+    // pick tab from query param if present
+    const params = new URLSearchParams(location.search);
+    const tab = params.get("tab");
+    if (tab) setActiveTab(tab);
 
     loadData();
   }, []); // ✅ FIXED: Empty dependency array - only run once on mount
 
   const loadData = () => {
     setLoading(true);
-    Promise.all([getAssignments(), getSubmissions()])
-      .then(([a, s]) => {
+    Promise.all([getAssignments(), getSubmissions(), getUsers("Student")])
+      .then(([a, s, st]) => {
         setAssignments(a || []);
         setSubmissions(s || []);
+        setStudents(st || []);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
+  };
+
+  const handleSetTab = (t) => {
+    setActiveTab(t);
+    navigate(`?tab=${t}`, { replace: true });
   };
 
   const handleLogout = () => {
@@ -58,17 +81,57 @@ export default function TeacherDashboard() {
       await createAssignment({
         title: newAssignment.title,
         description: newAssignment.description,
-        deadline: newAssignment.deadline
+        deadline: newAssignment.deadline,
+        maxMarks: Number(newAssignment.maxMarks) || 100
       });
       
       alert("Assignment created successfully!");
       setShowCreateModal(false);
-      setNewAssignment({ title: "", description: "", deadline: "" });
+      setNewAssignment({ title: "", description: "", deadline: "", maxMarks: 100 });
       loadData();
     } catch (err) {
       alert(err.message || "Failed to create assignment");
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleGrade = (submission) => {
+    setSelectedSubmission(submission);
+    setMarks(submission.marks?.toString() || "");
+    setFeedback(submission.feedback || "");
+    setShowGradeModal(true);
+  };
+
+  const handleSaveGrade = async () => {
+    if (!marks || marks === "") {
+      alert("Please enter marks before saving");
+      return;
+    }
+
+    const max = selectedSubmission && (selectedSubmission.assignmentMaxMarks || selectedSubmission.assignment?.maxMarks) ? (selectedSubmission.assignmentMaxMarks || selectedSubmission.assignment?.maxMarks) : 100;
+    if (Number(marks) < 0 || Number(marks) > Number(max)) {
+      alert(`Marks must be between 0 and ${max}`);
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await postFeedback({
+        submissionId: selectedSubmission._id || selectedSubmission.id,
+        marks: Number(marks),
+        feedback: feedback
+      });
+      alert("Feedback saved successfully!");
+      setShowGradeModal(false);
+      setSelectedSubmission(null);
+      setMarks("");
+      setFeedback("");
+      loadData();
+    } catch (err) {
+      alert(err.message || "Failed to save feedback");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -114,46 +177,7 @@ export default function TeacherDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top Navbar */}
-      <nav className="bg-white border-b border-gray-200 px-8 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
-              </svg>
-            </div>
-            <span className="text-xl font-bold text-gray-900">AMS</span>
-          </div>
-          
-          <div className="flex items-center gap-8">
-            <button 
-              onClick={() => setActiveTab("assignments")}
-              className={activeTab === "assignments" ? "text-blue-600 font-medium" : "text-gray-600 hover:text-gray-900"}
-            >
-              Assignments
-            </button>
-            <button 
-              onClick={() => setActiveTab("submissions")}
-              className={activeTab === "submissions" ? "text-blue-600 font-medium" : "text-gray-600 hover:text-gray-900"}
-            >
-              Submissions
-            </button>
-            <button 
-              onClick={() => setActiveTab("submissions")}
-              className="text-gray-600 hover:text-gray-900"
-            >
-              Feedback
-            </button>
-            <Link to="/teacher/analytics" className="text-gray-600 hover:text-gray-900">
-              Analytics
-            </Link>
-            <button onClick={handleLogout} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition">
-              Logout
-            </button>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-8">
@@ -177,7 +201,7 @@ export default function TeacherDashboard() {
         {/* Tabs */}
         <div className="flex gap-8 border-b border-gray-200 mb-8">
           <button
-            onClick={() => setActiveTab("assignments")}
+            onClick={() => handleSetTab("assignments")}
             className={`pb-4 font-medium transition relative ${
               activeTab === "assignments"
                 ? "text-blue-600"
@@ -190,7 +214,7 @@ export default function TeacherDashboard() {
             )}
           </button>
           <button
-            onClick={() => setActiveTab("submissions")}
+            onClick={() => handleSetTab("submissions")}
             className={`pb-4 font-medium transition relative ${
               activeTab === "submissions"
                 ? "text-blue-600"
@@ -199,6 +223,32 @@ export default function TeacherDashboard() {
           >
             Submissions
             {activeTab === "submissions" && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+            )}
+          </button>
+          <button
+            onClick={() => handleSetTab("feedback")}
+            className={`pb-4 font-medium transition relative ${
+              activeTab === "feedback"
+                ? "text-blue-600"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            Feedback
+            {activeTab === "feedback" && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+            )}
+          </button>
+          <button
+            onClick={() => navigate('/teacher/profile')}
+            className={`pb-4 font-medium transition relative ${
+              activeTab === "profile"
+                ? "text-blue-600"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            Profile
+            {activeTab === "profile" && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
             )}
           </button>
@@ -266,7 +316,7 @@ export default function TeacherDashboard() {
               </div>
             )}
           </>
-        ) : (
+        ) : activeTab === "submissions" ? (
           <>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Student Submissions</h2>
             {submissions.length === 0 ? (
@@ -299,12 +349,12 @@ export default function TeacherDashboard() {
                           )}
                         </td>
                         <td className="px-6 py-4">
-                          <Link
-                            to={`/teacher/feedback/${sub._id || sub.id}`}
+                          <button
+                            onClick={() => handleGrade(sub)}
                             className="text-blue-600 hover:text-blue-700 font-medium text-sm"
                           >
-                            {sub.marks != null ? "View" : "Grade"}
-                          </Link>
+                            {sub.marks != null ? "View/Edit" : "Grade"}
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -313,7 +363,80 @@ export default function TeacherDashboard() {
               </div>
             )}
           </>
-        )}
+        ) : activeTab === "feedback" ? (
+          <>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Graded Submissions</h2>
+            {submissions.filter(sub => sub.marks != null).length === 0 ? (
+              <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+                <p className="text-gray-500">No graded submissions yet</p>
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assignment</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Marks</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {submissions.filter(sub => sub.marks != null).map((sub) => (
+                      <tr key={sub._id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 text-sm">{sub.studentName || sub.student?.name || "Student"}</td>
+                        <td className="px-6 py-4 text-sm">{sub.assignmentTitle || sub.assignment?.title || "Assignment"}</td>
+                        <td className="px-6 py-4 text-sm">{formatDate(sub.submittedAt)}</td>
+                        <td className="px-6 py-4 text-sm font-medium">{sub.marks}/{sub.assignmentMaxMarks || sub.assignment?.maxMarks || 100}</td>
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() => handleGrade(sub)}
+                            className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                          >
+                            View/Edit
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        ) : null}
+      </div>
+
+      {/* Chat Section */}
+      <div className="max-w-7xl mx-auto p-8 border-t border-gray-200">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Chat with Students</h2>
+        <div className="flex gap-4">
+          <div className="w-1/3">
+            <h3 className="text-lg font-semibold mb-2">Select a Student</h3>
+            <div className="space-y-2">
+              {students.map((student) => {
+                const sid = student._id || student.id;
+                const selectedId = chatWithUser?._id || chatWithUser?.id;
+                return (
+                  <button
+                    key={sid}
+                    onClick={() => setChatWithUser(student)}
+                    className={`w-full text-left p-3 rounded-lg border ${
+                      selectedId === sid
+                        ? "bg-blue-100 border-blue-300"
+                        : "bg-white border-gray-200 hover:bg-gray-50"
+                    }`}
+                  >
+                    {student.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="w-2/3">
+            <Chat currentUser={user} chatWithUser={chatWithUser} />
+          </div>
+        </div>
       </div>
 
       {/* Create Assignment Modal */}
@@ -357,6 +480,18 @@ export default function TeacherDashboard() {
                 />
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Max Marks</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={newAssignment.maxMarks}
+                  onChange={(e) => setNewAssignment({...newAssignment, maxMarks: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  placeholder="Total marks for this assignment (e.g., 30)"
+                />
+              </div>
+
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
@@ -374,6 +509,71 @@ export default function TeacherDashboard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Grade Modal */}
+      {showGradeModal && selectedSubmission && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {selectedSubmission.marks != null ? "Edit" : "Grade"} Submission
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Student</label>
+                <p className="text-gray-900">{selectedSubmission.studentName || selectedSubmission.student?.name || "Student"}</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Assignment</label>
+                <p className="text-gray-900">{selectedSubmission.assignmentTitle || selectedSubmission.assignment?.title || "Assignment"}</p>
+              </div>
+
+              <div>
+                <label htmlFor="modal-marks" className="block text-sm font-medium text-gray-700 mb-2">Marks {selectedSubmission && (selectedSubmission.assignmentMaxMarks || selectedSubmission.assignment?.maxMarks) ? `(out of ${selectedSubmission.assignmentMaxMarks || selectedSubmission.assignment?.maxMarks})` : ""}</label>
+                <input
+                  id="modal-marks"
+                  type="number"
+                  min="0"
+                  max={selectedSubmission && (selectedSubmission.assignmentMaxMarks || selectedSubmission.assignment?.maxMarks) ? (selectedSubmission.assignmentMaxMarks || selectedSubmission.assignment?.maxMarks) : 100}
+                  value={marks}
+                  onChange={(e) => setMarks(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  placeholder="Enter marks"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="modal-feedback" className="block text-sm font-medium text-gray-700 mb-2">Feedback Comment</label>
+                <textarea
+                  id="modal-feedback"
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  rows={4}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                  placeholder="Provide detailed feedback here..."
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowGradeModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveGrade}
+                  disabled={saving}
+                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition disabled:opacity-50"
+                >
+                  {saving ? "Saving..." : "Save"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

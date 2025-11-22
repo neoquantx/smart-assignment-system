@@ -1,6 +1,6 @@
 // src/pages/StudentSubmissions.jsx
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getSubmissions } from "../services/api";
 import StudentLayout from "../components/StudentLayout";
 
@@ -111,7 +111,7 @@ export default function StudentSubmissions() {
                         <td className="px-6 py-4">
                           {isEvaluated ? (
                             <span className="font-semibold text-gray-900">
-                              {sub.marks}/100
+                              {sub.marks}/{sub.assignmentMaxMarks || sub.assignment?.maxMarks || 100}
                             </span>
                           ) : (
                             <span className="text-gray-500">Not Graded</span>
@@ -119,9 +119,9 @@ export default function StudentSubmissions() {
                         </td>
                         <td className="px-6 py-4">
                           {isEvaluated ? (
-                            <button className="text-blue-600 hover:text-blue-700 font-medium">
+                            <Link to={`/student/feedback/${sub._id || sub.id}`} className="text-blue-600 hover:text-blue-700 font-medium">
                               View Feedback
-                            </button>
+                            </Link>
                           ) : (
                             <span className="text-gray-500">No Feedback Yet</span>
                           )}

@@ -127,6 +127,42 @@ export async function getFeedback(id) {
   });
 }
 
+// ============= USERS =============
+export async function getUsers(role) {
+  const token = localStorage.getItem("token");
+  return await request(`/users?role=${role}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+// ============= MESSAGES =============
+export async function getMessages(userId) {
+  const token = localStorage.getItem("token");
+  return await request(`/messages/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function sendMessage(receiver, message) {
+  const token = localStorage.getItem("token");
+  return await request("/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ receiver, message }),
+  });
+}
+
+export async function markMessagesAsRead(userId) {
+  const token = localStorage.getItem("token");
+  return await request(`/messages/read/${userId}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
 // ============= ANALYTICS =============
 export async function getAnalytics() {
   const token = localStorage.getItem("token");
