@@ -17,7 +17,7 @@ const Analytics = lazy(() => import("./pages/Analytics.jsx"));
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Suspense fallback={<Loading />}>
         <Routes>
           {/* Public Routes */}
@@ -34,9 +34,9 @@ export default function App() {
 
           {/* Teacher Routes */}
           <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
-          <Route path="/teacher/profile" element={<TeacherProfile />} />
+          <Route path="/teacher/profile" element={<Navigate to="/teacher/dashboard?tab=profile" replace />} />
           <Route path="/teacher/feedback/:id" element={<FeedbackPage />} />
-          <Route path="/teacher/analytics" element={<Analytics />} />
+          <Route path="/teacher/analytics" element={<Navigate to="/teacher/dashboard?tab=analytics" replace />} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

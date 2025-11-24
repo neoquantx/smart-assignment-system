@@ -35,6 +35,16 @@ export const createSubmission = async (req, res) => {
   try {
     // multer puts file at req.file
     const assignmentId = req.body.assignmentId;
+
+    const assignment = await Assignment.findById(assignmentId);
+    if (!assignment) {
+      return res.status(404).json({ message: "Assignment not found" });
+    }
+
+    if (assignment.deadline && new Date() > new Date(assignment.deadline)) {
+      return res.status(400).json({ message: "The deadline for this assignment has passed. You can no longer submit." });
+    }
+
     const fileUrl = req.file ? `/uploads/${req.file.filename}` : "";
     const sub = await Submission.create({ assignment: assignmentId, student: req.user._id, fileUrl });
     res.status(201).json(sub);

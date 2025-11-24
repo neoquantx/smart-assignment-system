@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ProfileEditModal({ user, onSave, onClose }) {
   const [form, setForm] = useState({
@@ -22,70 +23,160 @@ export default function ProfileEditModal({ user, onSave, onClose }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-
-    const save = (avatarDataUrl) => {
-      const updated = {
-        ...(user || {}),
-        name: form.name,
-        email: form.email,
-        bio: form.bio,
-        department: form.department,
-        institution: form.institution,
-        courses: form.courses
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
-          .map((n) => ({ name: n })),
-      };
-      if (avatarDataUrl) updated.avatar = avatarDataUrl;
-      onSave(updated);
-    };
-
-    if (form.avatarFile) {
-      const reader = new FileReader();
-      reader.onload = (ev) => save(ev.target.result);
-      reader.readAsDataURL(form.avatarFile);
-    } else {
-      save();
-    }
+    // Pass the raw form state to the parent handler
+    onSave({
+      name: form.name,
+      email: form.email,
+      bio: form.bio,
+      department: form.department,
+      institution: form.institution,
+      courses: form.courses,
+      avatarFile: form.avatarFile
+    });
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg w-full max-w-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Edit Profile</h3>
-          <button type="button" onClick={onClose} className="text-gray-500">Close</button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+      />
+      
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl relative z-10 overflow-hidden flex flex-col max-h-[90vh]"
+      >
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+          <h3 className="text-xl font-bold text-gray-900">Edit Profile</h3>
+          <button 
+            type="button" 
+            onClick={onClose} 
+            className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-200"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 gap-3">
-          <label className="text-sm">Name</label>
-          <input name="name" value={form.name} onChange={handleChange} className="p-2 border rounded" />
+        <div className="overflow-y-auto p-6">
+          <form id="edit-profile-form" onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">Full Name</label>
+                <input 
+                  name="name" 
+                  value={form.name} 
+                  onChange={handleChange} 
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  placeholder="John Doe"
+                />
+              </div>
 
-          <label className="text-sm">Email</label>
-          <input name="email" value={form.email} onChange={handleChange} className="p-2 border rounded" />
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">Email Address</label>
+                <input 
+                  name="email" 
+                  value={form.email} 
+                  onChange={handleChange} 
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  placeholder="john@example.com"
+                />
+              </div>
+            </div>
 
-          <label className="text-sm">Bio</label>
-          <textarea name="bio" value={form.bio} onChange={handleChange} className="p-2 border rounded" />
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700">Bio</label>
+              <textarea 
+                name="bio" 
+                value={form.bio} 
+                onChange={handleChange} 
+                rows={3}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
+                placeholder="Tell us a bit about yourself..."
+              />
+            </div>
 
-          <label className="text-sm">Department</label>
-          <input name="department" value={form.department} onChange={handleChange} className="p-2 border rounded" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">Department</label>
+                <input 
+                  name="department" 
+                  value={form.department} 
+                  onChange={handleChange} 
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  placeholder="Computer Science"
+                />
+              </div>
 
-          <label className="text-sm">Institution</label>
-          <input name="institution" value={form.institution} onChange={handleChange} className="p-2 border rounded" />
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">Institution</label>
+                <input 
+                  name="institution" 
+                  value={form.institution} 
+                  onChange={handleChange} 
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  placeholder="University of Technology"
+                />
+              </div>
+            </div>
 
-          <label className="text-sm">Courses (comma separated)</label>
-          <input name="courses" value={form.courses} onChange={handleChange} className="p-2 border rounded" />
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700">Courses (comma separated)</label>
+              <input 
+                name="courses" 
+                value={form.courses} 
+                onChange={handleChange} 
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                placeholder="CS101, MATH202, PHY101"
+              />
+            </div>
 
-          <label className="text-sm">Avatar (optional)</label>
-          <input name="avatarFile" type="file" accept="image/*" onChange={handleChange} />
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700">Profile Picture</label>
+              <div className="flex items-center justify-center w-full">
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                    </svg>
+                    <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                    <p className="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                  </div>
+                  <input name="avatarFile" type="file" accept="image/*" onChange={handleChange} className="hidden" />
+                </label>
+              </div>
+              {form.avatarFile && (
+                <p className="text-sm text-green-600 font-medium mt-1">
+                  Selected: {form.avatarFile.name}
+                </p>
+              )}
+            </div>
+          </form>
         </div>
 
-        <div className="mt-4 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 border rounded">Cancel</button>
-          <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+          <button 
+            type="button" 
+            onClick={onClose} 
+            className="px-6 py-2.5 rounded-xl text-gray-700 font-medium hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            form="edit-profile-form"
+            className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30"
+          >
+            Save Changes
+          </button>
         </div>
-      </form>
+      </motion.div>
     </div>
   );
 }

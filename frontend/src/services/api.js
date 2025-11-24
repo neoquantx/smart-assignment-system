@@ -135,6 +135,25 @@ export async function getUsers(role) {
   });
 }
 
+export async function updateProfile(formData) {
+  const token = localStorage.getItem("token");
+  return await request("/users/profile", {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      // Note: Content-Type is automatically set by browser when using FormData
+    },
+    body: formData,
+  });
+}
+
+export async function getProfile() {
+  const token = localStorage.getItem("token");
+  return await request("/users/me", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
 // ============= MESSAGES =============
 export async function getMessages(userId) {
   const token = localStorage.getItem("token");
@@ -143,7 +162,21 @@ export async function getMessages(userId) {
   });
 }
 
-export async function sendMessage(receiver, message) {
+export async function getGroupMessages() {
+  const token = localStorage.getItem("token");
+  return await request("/messages/group/all", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function getConversations() {
+  const token = localStorage.getItem("token");
+  return await request("/messages/conversations", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function sendMessage(receiver, message, options = {}) {
   const token = localStorage.getItem("token");
   return await request("/messages", {
     method: "POST",
@@ -151,7 +184,7 @@ export async function sendMessage(receiver, message) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ receiver, message }),
+    body: JSON.stringify({ receiver, message, ...options }),
   });
 }
 
@@ -159,6 +192,13 @@ export async function markMessagesAsRead(userId) {
   const token = localStorage.getItem("token");
   return await request(`/messages/read/${userId}`, {
     method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function getUnreadSummary() {
+  const token = localStorage.getItem("token");
+  return await request("/messages/unread-summary", {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
