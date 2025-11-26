@@ -3,10 +3,10 @@ import { motion } from "framer-motion";
 
 export default function StatsCard({ icon, label, value, color = "blue" }) {
   const colorClasses = {
-    blue: "bg-blue-50 text-blue-600",
+    blue: "bg-[#f5f7f9] text-[#2c5f7a]",
     green: "bg-green-50 text-green-600",
     orange: "bg-orange-50 text-orange-600",
-    purple: "bg-purple-50 text-purple-600",
+    purple: "bg-[#e8eef2] text-[#2c5f7a]",
     red: "bg-red-50 text-red-600",
   };
 

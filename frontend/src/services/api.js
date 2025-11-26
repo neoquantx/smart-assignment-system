@@ -196,6 +196,14 @@ export async function markMessagesAsRead(userId) {
   });
 }
 
+export async function markGroupMessagesAsRead() {
+  const token = localStorage.getItem("token");
+  return await request("/messages/read-group", {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
 export async function getUnreadSummary() {
   const token = localStorage.getItem("token");
   return await request("/messages/unread-summary", {

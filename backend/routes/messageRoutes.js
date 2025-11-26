@@ -54,11 +54,39 @@ router.get("/unread-summary", authMiddleware, async (req, res) => {
 // Get group chat messages
 router.get("/group/all", authMiddleware, async (req, res) => {
   try {
+    const currentUserId = req.user.id;
+    const currentUserObjectId = new mongoose.Types.ObjectId(currentUserId);
+    
+    console.log(`[DEBUG] User ${currentUserId} fetching group messages`);
+    
     const messages = await Message.find({ isGroupChat: true })
       .sort({ timestamp: 1 })
       .populate("sender", "name");
+    
+    // First, initialize readBy array for messages that don't have it
+    await Message.updateMany(
+      { 
+        isGroupChat: true,
+        readBy: { $exists: false }
+      },
+      { $set: { readBy: [] } }
+    );
+    
+    // Mark all group messages as read by this user (excluding own messages)
+    const updateResult = await Message.updateMany(
+      { 
+        isGroupChat: true, 
+        sender: { $ne: currentUserObjectId },
+        readBy: { $ne: currentUserObjectId }
+      },
+      { $addToSet: { readBy: currentUserObjectId } }
+    );
+    
+    console.log(`[DEBUG] Marked ${updateResult.modifiedCount} messages as read for user ${currentUserId}`);
+    
     res.json(messages);
   } catch (error) {
+    console.error("Failed to fetch group messages:", error);
     res.status(500).json({ error: "Failed to fetch group messages" });
   }
 });
@@ -73,12 +101,27 @@ router.get("/conversations", authMiddleware, async (req, res) => {
     const lastGroupMessage = await Message.findOne({ isGroupChat: true })
       .sort({ timestamp: -1 });
     
+    // First ensure all group messages have readBy array
+    await Message.updateMany(
+      { isGroupChat: true, readBy: { $exists: false } },
+      { $set: { readBy: [] } }
+    );
+    
+    // Count unread group messages (messages not sent by current user and not read by current user)
+    const unreadGroupCount = await Message.countDocuments({
+      isGroupChat: true,
+      sender: { $ne: currentUserObjectId },
+      readBy: { $ne: currentUserObjectId }
+    });
+    
+    console.log(`[DEBUG] User ${currentUserId} has ${unreadGroupCount} unread group messages`);
+    
     const groupChat = {
       _id: "group",
       name: "Common Group Chat",
       lastMessage: lastGroupMessage ? lastGroupMessage.message : "No messages yet",
       timestamp: lastGroupMessage ? lastGroupMessage.timestamp : new Date(),
-      unreadCount: 0,
+      unreadCount: unreadGroupCount,
       isGroup: true,
       avatar: "👥"
     };
@@ -246,6 +289,27 @@ router.put("/read/:userId", authMiddleware, async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: "Failed to mark as read" });
+  }
+});
+
+// Mark group messages as read
+router.put("/read-group", authMiddleware, async (req, res) => {
+  try {
+    const currentUserId = req.user.id;
+    const currentUserObjectId = new mongoose.Types.ObjectId(currentUserId);
+
+    await Message.updateMany(
+      { 
+        isGroupChat: true, 
+        sender: { $ne: currentUserObjectId },
+        readBy: { $ne: currentUserObjectId }
+      },
+      { $addToSet: { readBy: currentUserObjectId } }
+    );
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to mark group messages as read" });
   }
 });
 

@@ -66,7 +66,7 @@ export default function StudentSubmissions() {
         {/* Table */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2c5f7a]"></div>
           </div>
         ) : subs.length === 0 ? (
           <motion.div 
@@ -83,7 +83,7 @@ export default function StudentSubmissions() {
             <p className="text-gray-500 mb-6">Submit your first assignment to see it here</p>
             <Link 
               to="/student/dashboard" 
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl shadow-sm text-white bg-[#2c5f7a] hover:bg-[#1a3a52] transition-colors"
             >
               Go to Dashboard
             </Link>
@@ -131,7 +131,7 @@ export default function StudentSubmissions() {
                           >
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-[#f5f7f9] flex items-center justify-center text-[#2c5f7a] flex-shrink-0">
                                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                   </svg>
@@ -157,7 +157,7 @@ export default function StudentSubmissions() {
                               {isEvaluated ? (
                                 <Link 
                                   to={`/student/feedback/${sub._id || sub.id}`} 
-                                  className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium hover:underline"
+                                  className="inline-flex items-center gap-1 text-[#2c5f7a] hover:text-[#1a3a52] font-medium hover:underline"
                                 >
                                   View Feedback
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,7 +216,7 @@ export default function StudentSubmissions() {
                         onClick={() => goToPage(page)}
                         className={`w-10 h-10 rounded-lg text-sm font-bold transition-all ${
                           currentPage === page
-                            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
+                            ? "bg-[#2c5f7a] text-white shadow-lg shadow-lg"
                             : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
                         }`}
                       >

@@ -1,6 +1,6 @@
 // src/pages/TeacherDashboard.jsx
 import React, { useEffect, useState, useMemo } from "react";
-import { getAssignments, getSubmissions, createAssignment, postFeedback, getUsers, getUnreadSummary, markMessagesAsRead, sendMessage, getConversations } from "../services/api";
+import { getAssignments, getSubmissions, createAssignment, postFeedback, getUsers, getUnreadSummary, markMessagesAsRead, sendMessage, getConversations, markGroupMessagesAsRead } from "../services/api";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Chat from "../components/Chat";
@@ -217,7 +217,25 @@ export default function TeacherDashboard() {
           next[item.senderId] = { count: item.unreadCount, name: item.senderName };
         });
         setUnreadMap(next);
-        setConversations(convos || []);
+        
+        // Merge conversations: keep local unreadCount if it's 0 (user has read it)
+        setConversations(prevConvos => {
+          if (!prevConvos || prevConvos.length === 0) return convos || [];
+          
+          return (convos || []).map(freshChat => {
+            const prevChat = prevConvos.find(c => c._id === freshChat._id);
+            if (!prevChat) return freshChat;
+            
+            // If we previously marked this as read (unreadCount = 0),
+            // only update if fresh data shows new unread messages
+            if (prevChat.unreadCount === 0 && freshChat.unreadCount > 0) {
+              return freshChat;
+            }
+            
+            // Otherwise keep the previous state (preserve our read status)
+            return prevChat.unreadCount === 0 ? prevChat : freshChat;
+          });
+        });
       } catch (err) {
         console.error("❌ Failed to load chat data", err);
       }
@@ -232,6 +250,17 @@ export default function TeacherDashboard() {
     if (chat.isGroup) {
       setChatMode("group");
       setChatWithUser(null);
+      // Clear unread count for group chat locally
+      setConversations(prev => prev.map(c => 
+        c._id === "group" ? { ...c, unreadCount: 0 } : c
+      ));
+      try {
+        await markGroupMessagesAsRead();
+        const refreshed = await getConversations();
+        setConversations(refreshed || []);
+      } catch (err) {
+        console.error("Failed to mark group messages as read", err);
+      }
     } else {
       setChatMode("individual");
       setChatWithUser({ _id: chat._id, name: chat.name });
@@ -289,7 +318,7 @@ export default function TeacherDashboard() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowCreateModal(true)}
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 transition shadow-lg shadow-blue-500/30"
+            className="bg-gradient-to-r from-[#2c5f7a] to-[#4a7a94] hover:from-[#1a3a52] hover:to-[#4a7a94] text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 transition shadow-lg"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
@@ -306,7 +335,7 @@ export default function TeacherDashboard() {
               onClick={() => handleSetTab(tab)}
               className={`pb-4 font-medium transition relative whitespace-nowrap px-2 ${
                 activeTab === tab
-                  ? "text-blue-600"
+                  ? "text-[#2c5f7a]"
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
@@ -314,7 +343,7 @@ export default function TeacherDashboard() {
               {activeTab === tab && (
                 <motion.div 
                   layoutId="activeTab"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2c5f7a]"
                 />
               )}
             </button>
@@ -331,7 +360,7 @@ export default function TeacherDashboard() {
               exit={{ opacity: 0 }}
               className="flex justify-center items-center h-64"
             >
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2c5f7a]"></div>
             </motion.div>
           ) : (
             <motion.div
@@ -346,8 +375,8 @@ export default function TeacherDashboard() {
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Assignments</h2>
                   {assignments.length === 0 ? (
                     <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center shadow-sm">
-                      <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-20 h-20 bg-[#e8eef2] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-10 h-10 text-[#8ba3b5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
                       </div>
@@ -355,7 +384,7 @@ export default function TeacherDashboard() {
                       <p className="text-gray-500 mb-6">Create your first assignment to get started!</p>
                       <button
                         onClick={() => setShowCreateModal(true)}
-                        className="text-blue-600 font-medium hover:text-blue-700"
+                        className="text-[#2c5f7a] font-medium hover:text-[#1a3a52]"
                       >
                         Create Assignment &rarr;
                       </button>
@@ -382,7 +411,7 @@ export default function TeacherDashboard() {
                                   status.color === "green"
                                     ? "bg-green-100 text-green-700"
                                     : status.color === "blue"
-                                    ? "bg-blue-100 text-blue-700"
+                                    ? "bg-[#e8eef2] text-[#1a3a52]"
                                     : "bg-yellow-100 text-yellow-700"
                                 }`}
                               >
@@ -408,9 +437,9 @@ export default function TeacherDashboard() {
                                 <span className="font-bold text-gray-900">{submissionCount}</span>
                               </div>
                               
-                              <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                                <div 
-                                  className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                                  <div
+                                  className="bg-[#2c5f7a] h-2 rounded-full transition-all duration-500"
                                   style={{ width: `${Math.min((submissionCount / totalStudents) * 100, 100)}%` }}
                                 ></div>
                               </div>
@@ -446,7 +475,7 @@ export default function TeacherDashboard() {
                               <tr key={sub._id} className="hover:bg-gray-50/80 transition-colors">
                                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
                                   <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xs">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#4a7a94] to-[#4a7a94] text-white flex items-center justify-center font-bold text-xs">
                                       {(sub.studentName || sub.student?.name || "S").charAt(0)}
                                     </div>
                                     {sub.studentName || sub.student?.name || "Student"}
@@ -464,7 +493,7 @@ export default function TeacherDashboard() {
                                 <td className="px-6 py-4">
                                   <button
                                     onClick={() => handleGrade(sub)}
-                                    className="text-blue-600 hover:text-blue-800 font-medium text-sm hover:underline"
+                                    className="text-[#2c5f7a] hover:text-[#1a3a52] font-medium text-sm hover:underline"
                                   >
                                     {sub.marks != null ? "View/Edit" : "Grade"}
                                   </button>
@@ -514,7 +543,7 @@ export default function TeacherDashboard() {
                                 <td className="px-6 py-4">
                                   <button
                                     onClick={() => handleGrade(sub)}
-                                    className="text-blue-600 hover:text-blue-800 font-medium text-sm hover:underline"
+                                    className="text-[#2c5f7a] hover:text-[#1a3a52] font-medium text-sm hover:underline"
                                   >
                                     View/Edit
                                   </button>
@@ -555,7 +584,7 @@ export default function TeacherDashboard() {
               <h3 className="font-bold text-gray-700">Chats</h3>
               <button 
                 onClick={() => setShowNewChatModal(true)}
-                className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-colors shadow-sm"
+                className="p-2 bg-[#e8eef2] text-[#2c5f7a] rounded-full hover:bg-[#b8c5d0] transition-colors shadow-sm"
                 title="New Chat"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -590,7 +619,7 @@ export default function TeacherDashboard() {
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
                 <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border border-gray-100">
-                  <svg className="w-12 h-12 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-12 h-12 text-[#b8c5d0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 </div>
@@ -635,7 +664,7 @@ export default function TeacherDashboard() {
                   value={studentSearch}
                   onChange={(e) => setStudentSearch(e.target.value)}
                   placeholder="Search students..."
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2c5f7a] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white"
                 />
               </div>
 
@@ -649,13 +678,13 @@ export default function TeacherDashboard() {
                     <button
                       key={student._id}
                       onClick={() => handleStartNewChat(student)}
-                      className="w-full flex items-center gap-4 p-3 hover:bg-blue-50 rounded-xl transition-all duration-200 text-left group border border-transparent hover:border-blue-100"
+                      className="w-full flex items-center gap-4 p-3 hover:bg-[#e8eef2] rounded-xl transition-all duration-200 text-left group border border-transparent hover:border-[#b8c5d0]"
                     >
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-md group-hover:scale-105 transition-transform">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4a7a94] to-[#4a7a94] text-white flex items-center justify-center font-bold text-lg shadow-md group-hover:scale-105 transition-transform">
                         {student.name.charAt(0)}
                       </div>
                       <div>
-                        <p className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors">{student.name}</p>
+                        <p className="font-bold text-gray-900 group-hover:text-[#1a3a52] transition-colors">{student.name}</p>
                         <p className="text-xs text-gray-500">{student.email}</p>
                       </div>
                     </button>
@@ -691,7 +720,7 @@ export default function TeacherDashboard() {
                     required
                     value={newAssignment.title}
                     onChange={(e) => setNewAssignment({...newAssignment, title: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2c5f7a] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white"
                     placeholder="Assignment title"
                   />
                 </div>
@@ -703,7 +732,7 @@ export default function TeacherDashboard() {
                     value={newAssignment.description}
                     onChange={(e) => setNewAssignment({...newAssignment, description: e.target.value})}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white resize-none"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2c5f7a] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white resize-none"
                     placeholder="Assignment description"
                   />
                 </div>
@@ -715,7 +744,7 @@ export default function TeacherDashboard() {
                     required
                     value={newAssignment.deadline}
                     onChange={(e) => setNewAssignment({...newAssignment, deadline: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2c5f7a] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white"
                   />
                 </div>
 
@@ -726,7 +755,7 @@ export default function TeacherDashboard() {
                     min={1}
                     value={newAssignment.maxMarks}
                     onChange={(e) => setNewAssignment({...newAssignment, maxMarks: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2c5f7a] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white"
                     placeholder="Total marks for this assignment (e.g., 30)"
                   />
                 </div>
@@ -742,7 +771,7 @@ export default function TeacherDashboard() {
                   <button
                     type="submit"
                     disabled={creating}
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:shadow-none"
+                    className="flex-1 px-4 py-3 bg-gradient-to-r from-[#2c5f7a] to-[#4a7a94] hover:from-[#1a3a52] hover:to-[#4a7a94] text-white rounded-xl font-bold transition-all shadow-lg disabled:opacity-50 disabled:shadow-none"
                   >
                     {creating ? "Creating..." : "Create Assignment"}
                   </button>
@@ -787,7 +816,7 @@ export default function TeacherDashboard() {
                     <div className="flex items-center gap-3 text-gray-500">
                       <button
                         type="button"
-                        className="hover:text-blue-600 transition-colors"
+                        className="hover:text-[#2c5f7a] transition-colors"
                         title="Open in new tab"
                         onClick={() =>
                           selectedSubmission.fileUrl &&
@@ -802,7 +831,7 @@ export default function TeacherDashboard() {
                         <a
                           href={getFileUrl(selectedSubmission.fileUrl)}
                           download
-                          className="hover:text-blue-600 transition-colors"
+                          className="hover:text-[#2c5f7a] transition-colors"
                           title="Download"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -839,7 +868,7 @@ export default function TeacherDashboard() {
                 {/* Right: student info and grading form */}
                 <div className="w-full lg:w-96 flex-shrink-0 flex flex-col gap-4 overflow-y-auto">
                   <div className="border border-gray-200 rounded-xl p-4 flex items-center gap-4 bg-white shadow-sm">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-md">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4a7a94] to-[#4a7a94] text-white flex items-center justify-center font-bold text-lg shadow-md">
                       {(selectedSubmission.studentName || selectedSubmission.student?.name || "S").charAt(0)}
                     </div>
                     <div>
@@ -889,7 +918,7 @@ export default function TeacherDashboard() {
                         }
                         value={marks}
                         onChange={(e) => setMarks(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white font-medium"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2c5f7a] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white font-medium"
                         placeholder="Enter marks"
                       />
                     </div>
@@ -905,7 +934,7 @@ export default function TeacherDashboard() {
                         id="modal-feedback"
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none text-sm flex-1 transition-all bg-gray-50 focus:bg-white"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#4a7a94] focus:border-transparent outline-none resize-none text-sm flex-1 transition-all bg-gray-50 focus:bg-white"
                         placeholder="Provide detailed feedback here. Focus on strengths and areas for improvement..."
                       />
                     </div>
@@ -921,7 +950,7 @@ export default function TeacherDashboard() {
                       <button
                         onClick={handleSaveGrade}
                         disabled={saving}
-                        className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:shadow-none"
+                        className="flex-1 px-4 py-3 bg-gradient-to-r from-[#2c5f7a] to-[#4a7a94] hover:from-[#1a3a52] hover:to-[#4a7a94] text-white rounded-xl font-bold transition-all shadow-lg shadow-lg disabled:opacity-50 disabled:shadow-none"
                       >
                         {saving ? "Saving..." : "Save Feedback"}
                       </button>

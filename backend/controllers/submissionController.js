@@ -11,15 +11,18 @@ export const listSubmissions = async (req, res) => {
       ...s.toObject(),
       assignmentTitle: s.assignment?.title,
       assignmentMaxMarks: s.assignment?.maxMarks || 100,
-      studentName: s.student?.name
+      studentName: s.student?.name,
+      studentAvatar: s.student?.avatar
     }));
     return res.json(shaped);
   } else {
-    const mine = await Submission.find({ student: req.user._id }).populate("assignment");
+    const mine = await Submission.find({ student: req.user._id }).populate("assignment student");
     const shaped = mine.map(s => ({
       ...s.toObject(),
       assignmentTitle: s.assignment?.title,
-      assignmentMaxMarks: s.assignment?.maxMarks || 100
+      assignmentMaxMarks: s.assignment?.maxMarks || 100,
+      studentName: s.student?.name,
+      studentAvatar: s.student?.avatar
     }));
     return res.json(shaped);
   }

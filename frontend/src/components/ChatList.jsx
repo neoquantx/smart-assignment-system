@@ -32,11 +32,11 @@ export default function ChatList({ conversations, onSelectChat, selectedChatId }
     const colors = [
       "bg-gradient-to-br from-red-400 to-red-600",
       "bg-gradient-to-br from-green-400 to-green-600",
-      "bg-gradient-to-br from-blue-400 to-blue-600",
+      "bg-gradient-to-br from-[#8ba3b5] to-[#4a7a94]",
       "bg-gradient-to-br from-yellow-400 to-yellow-600",
-      "bg-gradient-to-br from-purple-400 to-purple-600",
+      "bg-gradient-to-br from-[#8ba3b5] to-[#8ba3b5]",
       "bg-gradient-to-br from-pink-400 to-pink-600",
-      "bg-gradient-to-br from-indigo-400 to-indigo-600",
+      "bg-gradient-to-br from-[#8ba3b5] to-[#4a7a94]",
     ];
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
@@ -57,34 +57,48 @@ export default function ChatList({ conversations, onSelectChat, selectedChatId }
             transition={{ delay: index * 0.05 }}
             onClick={() => onSelectChat(chat)}
             className={`flex items-center p-4 cursor-pointer transition-all border-b border-gray-50 hover:bg-gray-50 relative ${
-              isSelected ? "bg-blue-50/50" : ""
+              isSelected ? "bg-[#f5f7f9]/50" : ""
             }`}
           >
             {isSelected && (
               <motion.div 
                 layoutId="activeChat"
-                className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600"
+                className="absolute left-0 top-0 bottom-0 w-1 bg-[#2c5f7a]"
               />
             )}
 
             {/* Avatar */}
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-lg text-white shadow-md ${
-                chat.isGroup ? "bg-gradient-to-br from-gray-700 to-gray-900" : getColor(chat.name)
-            }`}>
-              {chat.isGroup ? (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              ) : getInitials(chat.name)}
+            <div className="relative">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-lg text-white shadow-md ${
+                  chat.isGroup ? "bg-gradient-to-br from-gray-700 to-gray-900" : getColor(chat.name)
+              }`}>
+                {chat.isGroup ? (
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                ) : getInitials(chat.name)}
+              </div>
+              {/* Unread indicator dot on avatar */}
+              {chat.unreadCount > 0 && (
+                <motion.div 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white"
+                />
+              )}
             </div>
 
             {/* Content */}
             <div className="flex-1 ml-4 min-w-0">
               <div className="flex justify-between items-baseline mb-1">
-                <h3 className={`text-sm font-bold truncate ${isSelected ? "text-blue-700" : "text-gray-900"}`}>
+                <h3 className={`text-sm font-bold truncate ${
+                  chat.unreadCount > 0 ? "text-gray-900" : isSelected ? "text-[#1a3a52]" : "text-gray-900"
+                }`}>
                   {chat.name}
                 </h3>
-                <span className="text-xs text-gray-400 flex-shrink-0 ml-2 font-medium">
+                <span className={`text-xs flex-shrink-0 ml-2 font-medium ${
+                  chat.unreadCount > 0 ? "text-[#2c5f7a] font-semibold" : "text-gray-400"
+                }`}>
                   {formatTime(chat.timestamp)}
                 </span>
               </div>
@@ -93,9 +107,13 @@ export default function ChatList({ conversations, onSelectChat, selectedChatId }
                   {chat.lastMessage || "No messages yet"}
                 </p>
                 {chat.unreadCount > 0 && (
-                  <span className="flex-shrink-0 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[1.25rem] text-center shadow-sm shadow-blue-500/30">
-                    {chat.unreadCount}
-                  </span>
+                  <motion.span 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="flex-shrink-0 bg-[#2c5f7a] text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[1.25rem] text-center shadow-md"
+                  >
+                    {chat.unreadCount > 99 ? "99+" : chat.unreadCount}
+                  </motion.span>
                 )}
               </div>
             </div>

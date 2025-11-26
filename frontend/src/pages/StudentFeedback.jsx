@@ -59,7 +59,7 @@ export default function StudentFeedback() {
   if (loading) return (
     <StudentLayout>
       <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2c5f7a]"></div>
       </div>
     </StudentLayout>
   );
@@ -77,7 +77,7 @@ export default function StudentFeedback() {
           <p className="text-gray-500 mb-6">The submission you are looking for does not exist or you don't have permission to view it.</p>
           <button 
             onClick={() => navigate("/student/submissions")}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-2 bg-[#2c5f7a] text-white rounded-lg hover:bg-[#1a3a52] transition-colors"
           >
             Back to Submissions
           </button>
@@ -96,7 +96,7 @@ export default function StudentFeedback() {
         >
           <button 
             onClick={() => navigate("/student/submissions")}
-            className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors mb-4 group"
+            className="flex items-center gap-2 text-gray-500 hover:text-[#2c5f7a] transition-colors mb-4 group"
           >
             <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -104,7 +104,7 @@ export default function StudentFeedback() {
             Back to Submissions
           </button>
           <div className="flex items-center gap-3 mb-2">
-            <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wide border border-blue-100">
+            <span className="px-3 py-1 bg-[#f5f7f9] text-[#1a3a52] rounded-full text-xs font-bold uppercase tracking-wide border border-[#b8c5d0]">
               Assignment Feedback
             </span>
           </div>
@@ -136,7 +136,7 @@ export default function StudentFeedback() {
                       href={getFileUrl(submission.fileUrl)} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30 flex items-center gap-2"
+                      className="px-6 py-3 bg-[#2c5f7a] text-white rounded-xl font-medium hover:bg-[#1a3a52] transition-colors shadow-lg shadow-lg flex items-center gap-2"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -160,11 +160,17 @@ export default function StudentFeedback() {
             <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Submission Details</h3>
               <div className="flex items-center gap-4 mb-6">
-                <img 
-                  src={submission.studentAvatar || 'https://i.pravatar.cc/150?img=12'} 
-                  alt="avatar" 
-                  className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md" 
-                />
+                {(submission.student?.avatar || submission.studentAvatar || user.avatar) ? (
+                  <img 
+                    src={getFileUrl(submission.student?.avatar || submission.studentAvatar || user.avatar)} 
+                    alt="avatar" 
+                    className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md" 
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#4a7a94] to-[#4a7a94] flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    {(submission.studentName || submission.student?.name || user.name || "S").charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <div>
                   <div className="font-bold text-gray-900 text-lg">{submission.studentName || submission.student?.name || user.name}</div>
                   <div className="text-sm text-gray-500 font-medium">Student</div>
@@ -187,15 +193,15 @@ export default function StudentFeedback() {
 
             {/* Grade & Feedback Card */}
             <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-bl-full -mr-10 -mt-10"></div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#4a7a94]/10 to-[#8ba3b5]/10 rounded-bl-full -mr-10 -mt-10"></div>
               
               <h3 className="text-lg font-bold text-gray-900 mb-6 relative z-10">Grade & Feedback</h3>
               
               <div className="mb-8 text-center relative z-10">
-                <div className="inline-flex flex-col items-center justify-center w-32 h-32 rounded-full border-4 border-blue-100 bg-white shadow-sm mb-2">
+                <div className="inline-flex flex-col items-center justify-center w-32 h-32 rounded-full border-4 border-[#b8c5d0] bg-white shadow-sm mb-2">
                   {submission.marks != null ? (
                     <>
-                      <span className="text-4xl font-bold text-blue-600">{submission.marks}</span>
+                      <span className="text-4xl font-bold text-[#2c5f7a]">{submission.marks}</span>
                       <span className="text-xs text-gray-400 font-medium uppercase mt-1">out of {submission.assignmentMaxMarks || submission.assignment?.maxMarks || 100}</span>
                     </>
                   ) : (
@@ -207,7 +213,7 @@ export default function StudentFeedback() {
 
               <div className="relative z-10">
                 <div className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
-                  <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-[#4a7a94]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                   </svg>
                   Instructor Feedback

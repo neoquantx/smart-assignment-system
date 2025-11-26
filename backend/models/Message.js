@@ -9,6 +9,8 @@ const messageSchema = new mongoose.Schema({
   read: { type: Boolean, default: false },
   isBroadcast: { type: Boolean, default: false },
   isGroupChat: { type: Boolean, default: false },
+  // Track which users have read this group message
+  readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
 
 export default mongoose.model("Message", messageSchema);

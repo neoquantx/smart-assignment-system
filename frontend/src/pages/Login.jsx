@@ -41,7 +41,7 @@ export default function Login() {
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8 }}
-        className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-indigo-900 items-center justify-center p-12 relative overflow-hidden"
+        className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#1a3a52] via-[#2c5f7a] to-[#4a7a94] items-center justify-center p-12 relative overflow-hidden"
       >
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
         <div className="max-w-md text-white space-y-6 w-full flex flex-col items-center relative z-10">
@@ -55,7 +55,7 @@ export default function Login() {
              <div className="text-6xl">📚</div>
           </motion.div>
           <h2 className="text-4xl font-bold tracking-tight">Smart Assignment System</h2>
-          <p className="text-blue-100 text-lg text-center">Manage assignments, track progress, and collaborate efficiently in one unified platform.</p>
+          <p className="text-[#b8c5d0] text-lg text-center">Manage assignments, track progress, and collaborate efficiently in one unified platform.</p>
         </div>
       </motion.div>
 
@@ -68,7 +68,7 @@ export default function Login() {
           className="w-full max-w-md space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-gray-100"
         >
           <div className="text-center">
-            <div className="w-12 h-12 bg-blue-600 rounded-xl mx-auto mb-4 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-600/30">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#2c5f7a] to-[#4a7a94] rounded-xl mx-auto mb-4 flex items-center justify-center text-white font-bold text-xl shadow-lg">
               A
             </div>
             <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
@@ -99,7 +99,7 @@ export default function Login() {
                   required
                   value={form.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-gray-50 focus:bg-white"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#4a7a94] focus:border-transparent outline-none transition bg-gray-50 focus:bg-white"
                   placeholder="you@example.com"
                 />
               </div>
@@ -116,7 +116,7 @@ export default function Login() {
                     required
                     value={form.password}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-gray-50 focus:bg-white pr-12"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#4a7a94] focus:border-transparent outline-none transition bg-gray-50 focus:bg-white pr-12"
                     placeholder="••••••••"
                   />
                   <button
@@ -148,7 +148,7 @@ export default function Login() {
                     name="role"
                     value={form.role}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-gray-50 focus:bg-white appearance-none cursor-pointer"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#4a7a94] focus:border-transparent outline-none transition bg-gray-50 focus:bg-white appearance-none cursor-pointer"
                   >
                     <option value="Student">Student</option>
                     <option value="Teacher">Teacher</option>
@@ -165,7 +165,7 @@ export default function Login() {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 px-4 rounded-xl transition shadow-lg shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              className="w-full bg-gradient-to-r from-[#2c5f7a] to-[#4a7a94] hover:from-[#1a3a52] hover:to-[#2c5f7a] text-white font-semibold py-3.5 px-4 rounded-xl transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -180,7 +180,7 @@ export default function Login() {
 
             <p className="text-center text-sm text-gray-600">
               Don't have an account?{" "}
-              <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold hover:underline">
+              <Link to="/register" className="text-[#2c5f7a] hover:text-[#1a3a52] font-semibold hover:underline">
                 Create an account
               </Link>
             </p>

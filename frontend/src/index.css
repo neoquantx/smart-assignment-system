@@ -3,15 +3,20 @@
 @tailwind components;
 @tailwind utilities;
 
-/* small theme tokens to match screenshots */
+/* Beautiful color palette */
 :root{
-  --accent: #FDD9B1;
-  --primary: #2B6CE4;
+  --primary-dark: #1a3a52;
+  --primary: #2c5f7a;
+  --primary-light: #4a7a94;
+  --secondary: #8ba3b5;
+  --accent: #b8c5d0;
+  --light: #e8eef2;
   --card: #ffffff;
 }
 
 body { 
-  @apply antialiased bg-gray-50 text-gray-900;
+  @apply antialiased text-gray-900;
+  background: linear-gradient(135deg, #e8eef2 0%, #f5f7f9 100%);
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 

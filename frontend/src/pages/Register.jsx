@@ -74,9 +74,9 @@ export default function Register() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-blue-600 to-gray-50"></div>
-        <div className="absolute top-20 left-20 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute top-20 right-20 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-[#2c5f7a] to-gray-50"></div>
+        <div className="absolute top-20 left-20 w-72 h-72 bg-[#4a7a94] rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute top-20 right-20 w-72 h-72 bg-[#8ba3b5] rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
       </div>
 
       <motion.div 
@@ -106,7 +106,7 @@ export default function Register() {
                 required
                 value={form.name}
                 onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-white/50 focus:bg-white"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#4a7a94] focus:border-transparent outline-none transition bg-gray-50 focus:bg-white"
                 placeholder="Enter your full name"
               />
             </div>
@@ -123,7 +123,7 @@ export default function Register() {
                 required
                 value={form.email}
                 onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-white/50 focus:bg-white"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#4a7a94] focus:border-transparent outline-none transition bg-white/50 focus:bg-white"
                 placeholder="Enter your email address"
               />
             </div>
@@ -139,7 +139,7 @@ export default function Register() {
                   name="role"
                   value={form.role}
                   onChange={onChange}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-white/50 focus:bg-white appearance-none cursor-pointer"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#4a7a94] focus:border-transparent outline-none transition bg-white/50 focus:bg-white appearance-none cursor-pointer"
                 >
                   <option value="Student">Student</option>
                   <option value="Teacher">Teacher</option>
@@ -163,7 +163,7 @@ export default function Register() {
                   required
                   value={form.password}
                   onChange={onChange}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-white/50 focus:bg-white pr-12"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#4a7a94] focus:border-transparent outline-none transition bg-white/50 focus:bg-white pr-12"
                   placeholder="Create a password"
                 />
                 <button
@@ -199,7 +199,7 @@ export default function Register() {
                   value={form.confirm}
                   onChange={onChange}
                   className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent outline-none transition bg-white/50 focus:bg-white pr-12 ${
-                    error ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-blue-500'
+                    error ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-[#4a7a94]'
                   }`}
                   placeholder="Confirm your password"
                 />
@@ -237,7 +237,7 @@ export default function Register() {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 px-4 rounded-xl transition shadow-lg shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+              className="w-full bg-gradient-to-r from-[#2c5f7a] to-[#4a7a94] hover:from-[#1a3a52] hover:to-[#2c5f7a] text-white font-semibold py-3.5 px-4 rounded-xl transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Creating Account..." : "Register Now"}
             </motion.button>
@@ -247,7 +247,7 @@ export default function Register() {
         {/* Footer */}
         <p className="text-center text-sm text-gray-600 mt-6">
           Already have an account?{" "}
-          <Link to="/" className="text-blue-600 hover:text-blue-700 font-semibold hover:underline">
+          <Link to="/" className="text-[#2c5f7a] hover:text-[#1a3a52] font-semibold hover:underline">
             Login here
           </Link>
         </p>

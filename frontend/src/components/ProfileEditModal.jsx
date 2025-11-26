@@ -73,7 +73,7 @@ export default function ProfileEditModal({ user, onSave, onClose }) {
                   name="name" 
                   value={form.name} 
                   onChange={handleChange} 
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4a7a94] focus:border-[#4a7a94] outline-none transition-all"
                   placeholder="John Doe"
                 />
               </div>
@@ -84,7 +84,7 @@ export default function ProfileEditModal({ user, onSave, onClose }) {
                   name="email" 
                   value={form.email} 
                   onChange={handleChange} 
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4a7a94] focus:border-[#4a7a94] outline-none transition-all"
                   placeholder="john@example.com"
                 />
               </div>
@@ -97,7 +97,7 @@ export default function ProfileEditModal({ user, onSave, onClose }) {
                 value={form.bio} 
                 onChange={handleChange} 
                 rows={3}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4a7a94] focus:border-[#4a7a94] outline-none transition-all resize-none"
                 placeholder="Tell us a bit about yourself..."
               />
             </div>
@@ -109,7 +109,7 @@ export default function ProfileEditModal({ user, onSave, onClose }) {
                   name="department" 
                   value={form.department} 
                   onChange={handleChange} 
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4a7a94] focus:border-[#4a7a94] outline-none transition-all"
                   placeholder="Computer Science"
                 />
               </div>
@@ -120,20 +120,21 @@ export default function ProfileEditModal({ user, onSave, onClose }) {
                   name="institution" 
                   value={form.institution} 
                   onChange={handleChange} 
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4a7a94] focus:border-[#4a7a94] outline-none transition-all"
                   placeholder="University of Technology"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-700">Courses (comma separated)</label>
+              <label className="text-sm font-semibold text-gray-700">Courses</label>
+              <p className="text-xs text-gray-500 mb-2">Enter course name and code separated by colon (e.g., Artificial Intelligence:CS101)</p>
               <input 
                 name="courses" 
                 value={form.courses} 
                 onChange={handleChange} 
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                placeholder="CS101, MATH202, PHY101"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4a7a94] focus:border-[#4a7a94] outline-none transition-all"
+                placeholder="Artificial Intelligence:CS101, Mathematics:MATH202"
               />
             </div>
 
@@ -171,7 +172,7 @@ export default function ProfileEditModal({ user, onSave, onClose }) {
           <button 
             type="submit" 
             form="edit-profile-form"
-            className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30"
+            className="px-6 py-2.5 bg-[#2c5f7a] text-white rounded-xl font-medium hover:bg-[#1a3a52] transition-colors shadow-lg shadow-lg"
           >
             Save Changes
           </button>

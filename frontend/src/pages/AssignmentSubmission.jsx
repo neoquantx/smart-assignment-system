@@ -165,7 +165,7 @@ export default function AssignmentSubmission() {
     return (
       <StudentLayout>
         <div className="p-8 flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2c5f7a]"></div>
         </div>
       </StudentLayout>
     );
@@ -182,7 +182,7 @@ export default function AssignmentSubmission() {
           {/* Back Button */}
           <button 
             onClick={() => navigate("/student/dashboard")}
-            className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors mb-6 group"
+            className="flex items-center gap-2 text-gray-500 hover:text-[#2c5f7a] transition-colors mb-6 group"
           >
             <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -223,7 +223,7 @@ export default function AssignmentSubmission() {
             className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8 mb-8 shadow-sm"
           >
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-[#2c5f7a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               Instructions
@@ -248,8 +248,8 @@ export default function AssignmentSubmission() {
                 whileTap={{ scale: 0.99 }}
                 className={`border-3 border-dashed rounded-2xl p-12 mb-8 text-center transition-all duration-300 cursor-pointer ${
                   dragActive
-                    ? "border-blue-500 bg-blue-50 scale-105 shadow-lg"
-                    : "border-gray-300 bg-white hover:border-blue-400 hover:bg-gray-50"
+                    ? "border-[#4a7a94] bg-[#f5f7f9] scale-105 shadow-lg"
+                    : "border-gray-300 bg-white hover:border-[#4a7a94] hover:bg-gray-50"
                 }`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -258,10 +258,10 @@ export default function AssignmentSubmission() {
                 onClick={() => !deadlinePassed && fileInputRef.current?.click()}
               >
                 <div className="flex flex-col items-center pointer-events-none">
-                  <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 transition-colors ${dragActive ? "bg-blue-100" : "bg-gray-100"}`}>
+                  <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 transition-colors ${dragActive ? "bg-[#e8eef2]" : "bg-gray-100"}`}>
                     <svg
                       className={`w-10 h-10 ${
-                        dragActive ? "text-blue-600" : "text-gray-400"
+                        dragActive ? "text-[#2c5f7a]" : "text-gray-400"
                       }`}
                       fill="none"
                       stroke="currentColor"
@@ -362,7 +362,7 @@ export default function AssignmentSubmission() {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={deadlinePassed || !file || uploading}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold px-10 py-4 rounded-xl transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center gap-2"
+                  className="bg-gradient-to-r from-[#2c5f7a] to-[#4a7a94] hover:from-[#1a3a52] hover:to-[#4a7a94] text-white font-bold px-10 py-4 rounded-xl transition-all shadow-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center gap-2"
                 >
                   {deadlinePassed ? (
                     <>

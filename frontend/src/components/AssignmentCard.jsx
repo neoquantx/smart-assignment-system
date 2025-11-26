@@ -20,8 +20,8 @@ export default function AssignmentCard({ id, title, desc, date, subject = "Gener
     >
       <div className="p-6 flex-1 flex flex-col">
         <div className="flex justify-between items-start mb-4">
-          <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
-            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="p-2 bg-[#f5f7f9] rounded-lg group-hover:bg-[#e8eef2] transition-colors">
+            <svg className="w-6 h-6 text-[#2c5f7a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
@@ -30,7 +30,7 @@ export default function AssignmentCard({ id, title, desc, date, subject = "Gener
           </span>
         </div>
 
-        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors">
+        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-[#2c5f7a] transition-colors">
           {title}
         </h3>
         <p className="text-sm text-gray-600 mb-4 line-clamp-2 flex-1">
@@ -57,7 +57,7 @@ export default function AssignmentCard({ id, title, desc, date, subject = "Gener
         ) : (
           <Link
             to={`/student/submit/${id}`}
-            className="block w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center font-medium py-2.5 px-4 rounded-lg hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300 flex items-center justify-center gap-2"
+            className="block w-full bg-gradient-to-r from-[#2c5f7a] to-[#4a7a94] text-white text-center font-medium py-2.5 px-4 rounded-lg hover:shadow-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
           >
             <span>View / Submit</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
