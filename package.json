@@ -1,4 +1,13 @@
 {
+  "name": "smart-assignment-system",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "start:backend": "cd backend && npm start",
+    "dev:frontend": "cd frontend && npm run dev"
+  },
   "dependencies": {
     "framer-motion": "^12.23.24"
   }
