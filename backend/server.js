@@ -43,7 +43,7 @@ app.get("/api/ping", (req,res)=>res.json({ ok: true }));
 // serve built frontend (dist) if present
 const distPath = path.join(__dirname, "../dist");
 app.use(express.static(distPath));
-app.get("/*", (req, res) => {
+app.get('*', (req, res) => {
 	// if the request is for an API route, skip frontend serving
 	if (req.path.startsWith('/api')) return res.status(404).end();
 	res.sendFile(path.join(distPath, 'index.html'));
