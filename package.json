@@ -9,6 +9,9 @@
     "dev:frontend": "cd frontend && npm run dev"
   },
   "dependencies": {
-    "framer-motion": "^12.23.24"
+    "framer-motion": "^12.23.24",
+    "vite": "^4.4.5"
   }
 }
+
+
