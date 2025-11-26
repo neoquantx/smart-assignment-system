@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import path from "path";
+import fs from "fs";
 
 dotenv.config();
 const app = express();
@@ -43,10 +44,20 @@ app.get("/api/ping", (req,res)=>res.json({ ok: true }));
 // serve built frontend (dist) if present
 const distPath = path.join(__dirname, "../dist");
 app.use(express.static(distPath));
-app.get('*', (req, res) => {
-	// if the request is for an API route, skip frontend serving
-	if (req.path.startsWith('/api')) return res.status(404).end();
-	res.sendFile(path.join(distPath, 'index.html'));
+
+// Fallback handler to serve `index.html` for non-API routes.
+// Use `app.use` and a simple path check to avoid path-to-regexp parsing issues.
+app.use((req, res, next) => {
+	// let API and uploads routes pass through
+	if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+
+	const indexHtml = path.join(distPath, 'index.html');
+	if (fs.existsSync(indexHtml)) {
+		return res.sendFile(indexHtml);
+	}
+
+	// If no frontend build is present, continue to next handlers (404)
+	next();
 });
 
 const PORT = process.env.PORT || 8000;
