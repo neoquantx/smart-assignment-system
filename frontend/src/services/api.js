@@ -4,6 +4,19 @@ import axios from "axios";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
+if (!API_BASE) {
+  throw new Error(
+    "VITE_API_URL is not set. Define it in your environment (Vercel/Render) or in frontend/.env for local development."
+  );
+}
+
+// Prevent accidental production builds pointing at localhost.
+if (import.meta.env.PROD && /(localhost|127\.0\.0\.1)/i.test(API_BASE)) {
+  throw new Error(
+    `VITE_API_URL is set to a localhost address (${API_BASE}) in a production build. Set VITE_API_URL to your hosted backend origin.`
+  );
+}
+
 const api = axios.create({
   baseURL: API_BASE,
   withCredentials: true,
