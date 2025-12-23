@@ -77,11 +77,11 @@ export default function FeedbackPage() {
     });
   };
 
-  const API_ORIGIN = (import.meta.env.VITE_API_BASE || "http://localhost:8000").replace(/\/api$/, "");
+  const API_ORIGIN = import.meta.env.VITE_API_URL;
   const getFileUrl = (fileUrl) => {
     if (!fileUrl) return null;
     if (fileUrl.startsWith("http")) return fileUrl;
-    return `${API_ORIGIN}${fileUrl}`;
+    return `${API_ORIGIN}${fileUrl.startsWith("/") ? fileUrl : `/${fileUrl}`}`;
   };
   const isPDF = (urlOrFile) => {
     if (!urlOrFile) return false;

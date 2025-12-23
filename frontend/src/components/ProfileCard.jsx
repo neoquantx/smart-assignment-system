@@ -28,7 +28,8 @@ export default function ProfileCard({ user, onEdit, stats = {} }) {
   const getAvatarUrl = (path) => {
     if (!path) return null;
     if (path.startsWith("data:") || path.startsWith("http")) return path;
-    return `http://localhost:8000${path}`;
+    const API_BASE = import.meta.env.VITE_API_URL;
+    return `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
   };
 
   const avatarEl = avatar ? (

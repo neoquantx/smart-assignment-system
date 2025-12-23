@@ -63,12 +63,12 @@ PORT=8000                                  # optional
 Frontend (`frontend/.env`) — optional for local dev (used by `src/services/api.js`):
 
 ```
-VITE_API_BASE=http://localhost:8000/api
+VITE_API_URL=http://localhost:8000
 ```
 
 Notes:
 - In production, set `MONGO_URI` and `JWT_SECRET` via your host (Render/Vercel) environment settings. Do not commit secrets to the repo.
-- If you use a hosted backend URL, set `VITE_API_BASE` to `https://your-backend.example.com/api` or omit and use relative `/api` when co-hosted.
+- Set `VITE_API_URL` to your backend origin (e.g. `https://your-backend.example.com`).
 
 ## Installation (development)
 
@@ -101,7 +101,7 @@ cd frontend
 npm run dev
 ```
 
-Open the frontend dev server URL (typically `http://localhost:5173`) and the frontend will call the API at `VITE_API_BASE`.
+Open the frontend dev server URL (typically `http://localhost:5173`) and the frontend will call the API using `VITE_API_URL`.
 
 ## Build & Run (production-like)
 
@@ -148,7 +148,7 @@ smart-assignment-system/
 │  ├─ src/
 │  │  ├─ components/
 │  │  ├─ pages/
-│  │  └─ services/api.js    # API client (uses VITE_API_BASE)
+│  │  └─ services/api.js    # API client (uses VITE_API_URL)
 │  └─ package.json
 ├─ package.json              # Root scripts (build/start)
 ```

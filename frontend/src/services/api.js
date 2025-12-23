@@ -1,61 +1,61 @@
 // src/services/api.js
 
-const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
+import axios from "axios";
 
-async function request(path, opts = {}) {
-  const url = `${BASE}${path}`;
-  
-  try {
-    const res = await fetch(url, {
-      headers: {
-        Accept: "application/json",
-        ...(opts.headers || {}),
-      },
-      ...opts,
-    });
-    
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      throw new Error(text || `HTTP ${res.status}`);
-    }
-    
-    const contentType = res.headers.get("content-type") || "";
-    if (contentType.includes("application/json")) {
-      return res.json();
-    }
-    return res.text();
-  } catch (err) {
-    console.error("API Error:", err);
-    throw err;
+const API_BASE = import.meta.env.VITE_API_URL;
+
+const api = axios.create({
+  baseURL: API_BASE,
+  withCredentials: true,
+});
+
+export default api;
+
+function getAuthHeader() {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+function toMessage(error) {
+  if (axios.isAxiosError(error)) {
+    const msg =
+      error.response?.data?.message ||
+      (typeof error.response?.data === "string" ? error.response?.data : null) ||
+      error.message;
+    return msg || "Request failed";
   }
+  return error?.message || "Request failed";
 }
 
 // ============= AUTH =============
 export async function login(payload) {
-  return await request("/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const res = await api.post("/api/auth/login", payload);
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 export async function registerUser(payload) {
-  return await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const res = await api.post("/api/auth/register", payload);
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 // ============= ASSIGNMENTS =============
 export async function getAssignments() {
   const token = localStorage.getItem("token");
   if (!token) return [];
-  
+
   try {
-    return await request("/assignments", {
-      headers: { Authorization: `Bearer ${token}` },
+    const res = await api.get("/api/assignments", {
+      headers: getAuthHeader(),
     });
+    return res.data;
   } catch (err) {
     console.error("Get assignments error:", err);
     return [];
@@ -63,33 +63,40 @@ export async function getAssignments() {
 }
 
 export async function getAssignment(id) {
-  const token = localStorage.getItem("token");
-  return await request(`/assignments/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    const res = await api.get(`/api/assignments/${id}`, {
+      headers: getAuthHeader(),
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 export async function createAssignment(payload) {
-  const token = localStorage.getItem("token");
-  return await request("/assignments", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const res = await api.post("/api/assignments", payload, {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 // ============= SUBMISSIONS =============
 export async function getSubmissions() {
   const token = localStorage.getItem("token");
   if (!token) return [];
-  
+
   try {
-    return await request("/submissions", {
-      headers: { Authorization: `Bearer ${token}` },
+    const res = await api.get("/api/submissions", {
+      headers: getAuthHeader(),
     });
+    return res.data;
   } catch (err) {
     console.error("Get submissions error:", err);
     return [];
@@ -97,137 +104,183 @@ export async function getSubmissions() {
 }
 
 export async function createSubmission(formData) {
-  const token = localStorage.getItem("token");
-  return await request("/submissions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-  });
+  try {
+    const res = await api.post("/api/submissions", formData, {
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 // ============= FEEDBACK =============
 export async function postFeedback(payload) {
-  const token = localStorage.getItem("token");
-  return await request("/feedback", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const res = await api.post("/api/feedback", payload, {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 export async function getFeedback(id) {
-  const token = localStorage.getItem("token");
-  return await request(`/feedback/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    const res = await api.get(`/api/feedback/${id}`, {
+      headers: getAuthHeader(),
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 // ============= USERS =============
 export async function getUsers(role) {
-  const token = localStorage.getItem("token");
-  return await request(`/users?role=${role}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    const res = await api.get(`/api/users?role=${role}`, {
+      headers: getAuthHeader(),
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 export async function updateProfile(formData) {
-  const token = localStorage.getItem("token");
-  return await request("/users/profile", {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      // Note: Content-Type is automatically set by browser when using FormData
-    },
-    body: formData,
-  });
+  try {
+    const res = await api.put("/api/users/profile", formData, {
+      headers: {
+        ...getAuthHeader(),
+        // Note: Content-Type is automatically set by browser when using FormData
+      },
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 export async function getProfile() {
-  const token = localStorage.getItem("token");
-  return await request("/users/me", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    const res = await api.get("/api/users/me", {
+      headers: getAuthHeader(),
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 // ============= MESSAGES =============
 export async function getMessages(userId) {
-  const token = localStorage.getItem("token");
-  return await request(`/messages/${userId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    const res = await api.get(`/api/messages/${userId}`, {
+      headers: getAuthHeader(),
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 export async function getGroupMessages() {
-  const token = localStorage.getItem("token");
-  return await request("/messages/group/all", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    const res = await api.get("/api/messages/group/all", {
+      headers: getAuthHeader(),
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 export async function getConversations() {
-  const token = localStorage.getItem("token");
-  return await request("/messages/conversations", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    const res = await api.get("/api/messages/conversations", {
+      headers: getAuthHeader(),
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 export async function sendMessage(receiver, message, options = {}) {
-  const token = localStorage.getItem("token");
-  return await request("/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ receiver, message, ...options }),
-  });
+  try {
+    const res = await api.post(
+      "/api/messages",
+      { receiver, message, ...options },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+      }
+    );
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 export async function markMessagesAsRead(userId) {
-  const token = localStorage.getItem("token");
-  return await request(`/messages/read/${userId}`, {
-    method: "PUT",
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    const res = await api.put(`/api/messages/read/${userId}`, null, {
+      headers: getAuthHeader(),
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 export async function markGroupMessagesAsRead() {
-  const token = localStorage.getItem("token");
-  return await request("/messages/read-group", {
-    method: "PUT",
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    const res = await api.put("/api/messages/read-group", null, {
+      headers: getAuthHeader(),
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 export async function getUnreadSummary() {
-  const token = localStorage.getItem("token");
-  return await request("/messages/unread-summary", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    const res = await api.get("/api/messages/unread-summary", {
+      headers: getAuthHeader(),
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
 }
 
 // ============= ANALYTICS =============
 export async function getAnalytics() {
-  const token = localStorage.getItem("token");
   try {
-    return await request("/analytics", {
-      headers: { Authorization: `Bearer ${token}` },
+    const res = await api.get("/api/analytics", {
+      headers: getAuthHeader(),
     });
+    return res.data;
   } catch (err) {
     console.error("Get analytics error:", err);
-    return { 
-      assignmentStats: [], 
-      submissionStatus: [], 
-      totals: { 
-        totalAssignments: 0, 
-        totalSubmissions: 0, 
-        pendingEvaluations: 0 
-      } 
+    return {
+      assignmentStats: [],
+      submissionStatus: [],
+      totals: {
+        totalAssignments: 0,
+        totalSubmissions: 0,
+        pendingEvaluations: 0,
+      },
     };
   }
 }

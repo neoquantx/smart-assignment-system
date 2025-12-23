@@ -48,7 +48,8 @@ export default function TeacherDashboard() {
     if (filePath.startsWith("http://") || filePath.startsWith("https://")) {
       return filePath;
     }
-    return `http://localhost:8000${filePath.startsWith("/") ? filePath : `/${filePath}`}`;
+    const API_BASE = import.meta.env.VITE_API_URL;
+    return `${API_BASE}${filePath.startsWith("/") ? filePath : `/${filePath}`}`;
   };
 
   useEffect(() => {
