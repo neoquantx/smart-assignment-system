@@ -23,10 +23,9 @@ const storage = new CloudinaryStorage({
     let folder = "smart-assignment-system";
     let resource_type = "auto";
 
-    // For PDFs and Docs, we want 'raw' or 'auto' but ensure no image transformations are applied by default.
-    // Cloudinary's "auto" should handle it, but sometimes "raw" is safer for non-images like .doc/.docx
+    // For PDFs and Docs, we want 'raw' to ensure no image transformations (like q_auto) are applied.
     if (file.mimetype === "application/pdf") {
-      resource_type = "auto"; // PDF can be 'image' or 'raw', auto usually works best for previews
+      resource_type = "raw";
     } else if (file.mimetype === "application/msword" || file.mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
       resource_type = "raw";
     }
@@ -35,7 +34,7 @@ const storage = new CloudinaryStorage({
       folder: folder,
       resource_type: resource_type,
       allowed_formats: ["jpg", "jpeg", "png", "pdf", "doc", "docx"],
-      // explicit public_id can be added here if needed
+      public_id: file.originalname.split('.')[0] + "-" + Date.now() // Use original name + timestamp
     };
   },
 });
