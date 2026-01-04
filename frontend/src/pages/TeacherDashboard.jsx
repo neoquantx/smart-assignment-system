@@ -20,7 +20,7 @@ export default function TeacherDashboard() {
   const [activeTab, setActiveTab] = useState("assignments");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [creating, setCreating] = useState(false);
-  
+
   const [newAssignment, setNewAssignment] = useState({
     title: "",
     description: "",
@@ -33,7 +33,7 @@ export default function TeacherDashboard() {
   const [marks, setMarks] = useState("");
   const [feedback, setFeedback] = useState("");
   const [saving, setSaving] = useState(false);
-  
+
   // Chat State
   const [chatWithUser, setChatWithUser] = useState(null);
   const [students, setStudents] = useState([]);
@@ -78,7 +78,7 @@ export default function TeacherDashboard() {
         setStudents(st || []);
         setConversations(c || []);
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   };
 
@@ -96,7 +96,7 @@ export default function TeacherDashboard() {
   const handleCreateAssignment = async (e) => {
     e.preventDefault();
     setCreating(true);
-    
+
     try {
       await createAssignment({
         title: newAssignment.title,
@@ -104,7 +104,7 @@ export default function TeacherDashboard() {
         deadline: newAssignment.deadline,
         maxMarks: Number(newAssignment.maxMarks) || 100
       });
-      
+
       alert("Assignment created successfully!");
       setShowCreateModal(false);
       setNewAssignment({ title: "", description: "", deadline: "", maxMarks: 100 });
@@ -158,9 +158,9 @@ export default function TeacherDashboard() {
   const formatDate = (dateString) => {
     if (!dateString) return "No deadline";
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", { 
-      year: "numeric", 
-      month: "short", 
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
       day: "numeric",
       hour: "numeric",
       minute: "2-digit",
@@ -170,18 +170,18 @@ export default function TeacherDashboard() {
 
   const getAssignmentStatus = (assignment) => {
     if (!assignment.deadline) return { label: "Active", color: "green" };
-    
+
     const now = new Date();
     const deadline = new Date(assignment.deadline);
-    const submissionCount = submissions.filter(s => 
+    const submissionCount = submissions.filter(s =>
       String(s.assignment?._id || s.assignment) === String(assignment._id)
     ).length;
-    
-    const relatedSubs = submissions.filter(s => 
+
+    const relatedSubs = submissions.filter(s =>
       String(s.assignment?._id || s.assignment) === String(assignment._id)
     );
     const allGraded = relatedSubs.length > 0 && relatedSubs.every(s => s.marks != null);
-    
+
     if (allGraded) return { label: "Graded", color: "blue" };
     if (now > deadline) return { label: "Active", color: "green" };
     if (now < deadline && submissionCount === 0) return { label: "Upcoming", color: "yellow" };
@@ -189,7 +189,7 @@ export default function TeacherDashboard() {
   };
 
   const getSubmissionCount = (assignmentId) => {
-    const count = submissions.filter(s => 
+    const count = submissions.filter(s =>
       String(s.assignment?._id || s.assignment) === String(assignmentId)
     ).length;
     return count;
@@ -212,27 +212,27 @@ export default function TeacherDashboard() {
           getUnreadSummary(),
           getConversations()
         ]);
-        
+
         const next = {};
         (summary || []).forEach((item) => {
           next[item.senderId] = { count: item.unreadCount, name: item.senderName };
         });
         setUnreadMap(next);
-        
+
         // Merge conversations: keep local unreadCount if it's 0 (user has read it)
         setConversations(prevConvos => {
           if (!prevConvos || prevConvos.length === 0) return convos || [];
-          
+
           return (convos || []).map(freshChat => {
             const prevChat = prevConvos.find(c => c._id === freshChat._id);
             if (!prevChat) return freshChat;
-            
+
             // If we previously marked this as read (unreadCount = 0),
             // only update if fresh data shows new unread messages
             if (prevChat.unreadCount === 0 && freshChat.unreadCount > 0) {
               return freshChat;
             }
-            
+
             // Otherwise keep the previous state (preserve our read status)
             return prevChat.unreadCount === 0 ? prevChat : freshChat;
           });
@@ -252,7 +252,7 @@ export default function TeacherDashboard() {
       setChatMode("group");
       setChatWithUser(null);
       // Clear unread count for group chat locally
-      setConversations(prev => prev.map(c => 
+      setConversations(prev => prev.map(c =>
         c._id === "group" ? { ...c, unreadCount: 0 } : c
       ));
       try {
@@ -271,7 +271,7 @@ export default function TeacherDashboard() {
         // Update local unread map
         setUnreadMap((prev) => ({ ...prev, [chat._id]: { ...prev[chat._id], count: 0 } }));
         // Update conversation list locally to reflect read status
-        setConversations(prev => prev.map(c => 
+        setConversations(prev => prev.map(c =>
           c._id === chat._id ? { ...c, unreadCount: 0 } : c
         ));
       } catch (err) {
@@ -306,7 +306,7 @@ export default function TeacherDashboard() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-4 lg:p-8">
         {/* Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4"
@@ -322,7 +322,7 @@ export default function TeacherDashboard() {
             className="bg-gradient-to-r from-[#2c5f7a] to-[#4a7a94] hover:from-[#1a3a52] hover:to-[#4a7a94] text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 transition shadow-lg"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             Create New Assignment
           </motion.button>
@@ -334,15 +334,14 @@ export default function TeacherDashboard() {
             <button
               key={tab}
               onClick={() => handleSetTab(tab)}
-              className={`pb-4 font-medium transition relative whitespace-nowrap px-2 ${
-                activeTab === tab
+              className={`pb-4 font-medium transition relative whitespace-nowrap px-2 ${activeTab === tab
                   ? "text-[#2c5f7a]"
                   : "text-gray-600 hover:text-gray-900"
-              }`}
+                }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
               {activeTab === tab && (
-                <motion.div 
+                <motion.div
                   layoutId="activeTab"
                   className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2c5f7a]"
                 />
@@ -354,7 +353,7 @@ export default function TeacherDashboard() {
         {/* Content */}
         <AnimatePresence mode="wait">
           {loading ? (
-            <motion.div 
+            <motion.div
               key="loading"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -396,7 +395,7 @@ export default function TeacherDashboard() {
                         const status = getAssignmentStatus(assignment);
                         const submissionCount = getSubmissionCount(assignment._id);
                         const totalStudents = 30; // Placeholder
-                        
+
                         return (
                           <motion.div
                             key={assignment._id}
@@ -408,38 +407,37 @@ export default function TeacherDashboard() {
                                 {assignment.title}
                               </h3>
                               <span
-                                className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                                  status.color === "green"
+                                className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${status.color === "green"
                                     ? "bg-green-100 text-green-700"
                                     : status.color === "blue"
-                                    ? "bg-[#e8eef2] text-[#1a3a52]"
-                                    : "bg-yellow-100 text-yellow-700"
-                                }`}
+                                      ? "bg-[#e8eef2] text-[#1a3a52]"
+                                      : "bg-yellow-100 text-yellow-700"
+                                  }`}
                               >
                                 {status.label}
                               </span>
                             </div>
-                            
+
                             <div className="space-y-4">
                               <div className="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
                                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                                 <span className="font-medium">{formatDate(assignment.deadline)}</span>
                               </div>
-                              
+
                               <div className="flex items-center justify-between text-sm">
                                 <div className="flex items-center gap-2 text-gray-600">
                                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                   </svg>
                                   <span>Submissions</span>
                                 </div>
                                 <span className="font-bold text-gray-900">{submissionCount}</span>
                               </div>
-                              
-                                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                  <div
+
+                              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                                <div
                                   className="bg-[#2c5f7a] h-2 rounded-full transition-all duration-500"
                                   style={{ width: `${Math.min((submissionCount / totalStudents) * 100, 100)}%` }}
                                 ></div>
@@ -568,7 +566,7 @@ export default function TeacherDashboard() {
       </div>
 
       {/* Chat Section */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
@@ -583,7 +581,7 @@ export default function TeacherDashboard() {
           <div className="w-full md:w-1/3 border-r border-gray-200 flex flex-col h-full">
             <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/50 backdrop-blur-sm">
               <h3 className="font-bold text-gray-700">Chats</h3>
-              <button 
+              <button
                 onClick={() => setShowNewChatModal(true)}
                 className="p-2 bg-[#e8eef2] text-[#2c5f7a] rounded-full hover:bg-[#b8c5d0] transition-colors shadow-sm"
                 title="New Chat"
@@ -593,10 +591,10 @@ export default function TeacherDashboard() {
                 </svg>
               </button>
             </div>
-            
+
             <div className="flex-1 overflow-hidden">
-              <ChatList 
-                conversations={conversations} 
+              <ChatList
+                conversations={conversations}
                 onSelectChat={handleSelectChat}
                 selectedChatId={chatMode === "group" ? "group" : chatWithUser?._id}
               />
@@ -606,15 +604,15 @@ export default function TeacherDashboard() {
           {/* Right Side: Chat Window */}
           <div className="hidden md:flex w-2/3 flex-col bg-gray-50/50">
             {chatMode === "group" ? (
-              <Chat 
-                currentUser={user} 
-                isGroupChat={true} 
+              <Chat
+                currentUser={user}
+                isGroupChat={true}
                 onMessageSent={() => getConversations().then(c => setConversations(c || []))}
               />
             ) : chatWithUser ? (
-              <Chat 
-                currentUser={user} 
-                chatWithUser={chatWithUser} 
+              <Chat
+                currentUser={user}
+                chatWithUser={chatWithUser}
                 onMessageSent={() => getConversations().then(c => setConversations(c || []))}
               />
             ) : (
@@ -635,13 +633,13 @@ export default function TeacherDashboard() {
       {/* New Chat Modal */}
       <AnimatePresence>
         {showNewChatModal && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
@@ -655,7 +653,7 @@ export default function TeacherDashboard() {
                   </svg>
                 </button>
               </div>
-              
+
               <div className="mb-4 relative">
                 <svg className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -700,13 +698,13 @@ export default function TeacherDashboard() {
       {/* Create Assignment Modal */}
       <AnimatePresence>
         {showCreateModal && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
@@ -720,31 +718,31 @@ export default function TeacherDashboard() {
                     type="text"
                     required
                     value={newAssignment.title}
-                    onChange={(e) => setNewAssignment({...newAssignment, title: e.target.value})}
+                    onChange={(e) => setNewAssignment({ ...newAssignment, title: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2c5f7a] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white"
                     placeholder="Assignment title"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
                   <textarea
                     required
                     value={newAssignment.description}
-                    onChange={(e) => setNewAssignment({...newAssignment, description: e.target.value})}
+                    onChange={(e) => setNewAssignment({ ...newAssignment, description: e.target.value })}
                     rows={3}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2c5f7a] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white resize-none"
                     placeholder="Assignment description"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Deadline</label>
                   <input
                     type="datetime-local"
                     required
                     value={newAssignment.deadline}
-                    onChange={(e) => setNewAssignment({...newAssignment, deadline: e.target.value})}
+                    onChange={(e) => setNewAssignment({ ...newAssignment, deadline: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2c5f7a] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white"
                   />
                 </div>
@@ -755,7 +753,7 @@ export default function TeacherDashboard() {
                     type="number"
                     min={1}
                     value={newAssignment.maxMarks}
-                    onChange={(e) => setNewAssignment({...newAssignment, maxMarks: e.target.value})}
+                    onChange={(e) => setNewAssignment({ ...newAssignment, maxMarks: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2c5f7a] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white"
                     placeholder="Total marks for this assignment (e.g., 30)"
                   />
@@ -786,13 +784,13 @@ export default function TeacherDashboard() {
       {/* Grade Modal */}
       <AnimatePresence>
         {showGradeModal && selectedSubmission && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
@@ -843,7 +841,12 @@ export default function TeacherDashboard() {
                     </div>
                   </div>
 
-                  <div className="flex-1 flex items-center justify-center px-6 py-8 bg-gray-100/50">
+                  <div className="flex-1 flex items-center justify-center px-6 py-8 bg-gray-100/50 flex-col">
+                    {/* DEBUG: Show the URL we are trying to load */}
+                    <div className="mb-4 p-2 bg-yellow-100 text-xs break-all w-full text-center border border-yellow-200 rounded">
+                      DEBUG URL: {getFileUrl(selectedSubmission.fileUrl) || "No URL found"}
+                    </div>
+
                     {selectedSubmission.fileUrl ? (
                       <iframe
                         src={getFileUrl(selectedSubmission.fileUrl)}
@@ -899,11 +902,10 @@ export default function TeacherDashboard() {
                       >
                         Marks{" "}
                         {selectedSubmission &&
-                        (selectedSubmission.assignmentMaxMarks || selectedSubmission.assignment?.maxMarks)
-                          ? `(out of ${
-                              selectedSubmission.assignmentMaxMarks ||
-                              selectedSubmission.assignment?.maxMarks
-                            })`
+                          (selectedSubmission.assignmentMaxMarks || selectedSubmission.assignment?.maxMarks)
+                          ? `(out of ${selectedSubmission.assignmentMaxMarks ||
+                          selectedSubmission.assignment?.maxMarks
+                          })`
                           : ""}
                       </label>
                       <input
@@ -912,9 +914,9 @@ export default function TeacherDashboard() {
                         min="0"
                         max={
                           selectedSubmission &&
-                          (selectedSubmission.assignmentMaxMarks || selectedSubmission.assignment?.maxMarks)
+                            (selectedSubmission.assignmentMaxMarks || selectedSubmission.assignment?.maxMarks)
                             ? selectedSubmission.assignmentMaxMarks ||
-                              selectedSubmission.assignment?.maxMarks
+                            selectedSubmission.assignment?.maxMarks
                             : 100
                         }
                         value={marks}
