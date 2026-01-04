@@ -18,9 +18,25 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: "smart-assignment-system", // Folder name in Cloudinary
-    allowed_formats: ["jpg", "jpeg", "png", "pdf", "doc", "docx"],
+  params: async (req, file) => {
+    // defaults
+    let folder = "smart-assignment-system";
+    let resource_type = "auto";
+
+    // For PDFs and Docs, we want 'raw' or 'auto' but ensure no image transformations are applied by default.
+    // Cloudinary's "auto" should handle it, but sometimes "raw" is safer for non-images like .doc/.docx
+    if (file.mimetype === "application/pdf") {
+      resource_type = "auto"; // PDF can be 'image' or 'raw', auto usually works best for previews
+    } else if (file.mimetype === "application/msword" || file.mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+      resource_type = "raw";
+    }
+
+    return {
+      folder: folder,
+      resource_type: resource_type,
+      allowed_formats: ["jpg", "jpeg", "png", "pdf", "doc", "docx"],
+      // explicit public_id can be added here if needed
+    };
   },
 });
 
