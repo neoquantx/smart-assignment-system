@@ -5,6 +5,11 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+console.log("Cloudinary Config Check:");
+console.log("Cloud Name:", process.env.CLOUDINARY_CLOUD_NAME ? "Set" : "Missing");
+console.log("API Key:", process.env.CLOUDINARY_API_KEY ? "Set" : "Missing");
+console.log("API Secret:", process.env.CLOUDINARY_API_SECRET ? "Set (Masked)" : "Missing");
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,

@@ -60,5 +60,14 @@ app.use((req, res, next) => {
 	next();
 });
 
+// Global Error Handler
+app.use((err, req, res, next) => {
+	console.error("Global Error:", err);
+	res.status(500).json({
+		message: "Internal Server Error",
+		error: process.env.NODE_ENV === "development" ? err.message : undefined
+	});
+});
+
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
