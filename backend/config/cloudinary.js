@@ -30,11 +30,16 @@ const storage = new CloudinaryStorage({
       resource_type = "raw";
     }
 
+    // Generate public_id with extension for raw files so they are served with correct headers/extensions
+    const name = file.originalname.split(".")[0];
+    const ext = file.originalname.split(".").pop();
+
     return {
       folder: folder,
       resource_type: resource_type,
       allowed_formats: ["jpg", "jpeg", "png", "pdf", "doc", "docx"],
-      public_id: file.originalname.split('.')[0] + "-" + Date.now() // Use original name + timestamp
+      public_id: `${name}-${Date.now()}.${ext}`,
+      format: ext
     };
   },
 });
