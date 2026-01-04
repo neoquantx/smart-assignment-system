@@ -34,13 +34,18 @@ const storage = new CloudinaryStorage({
     const name = file.originalname.split(".")[0];
     const ext = file.originalname.split(".").pop();
 
-    return {
+    const params = {
       folder: folder,
       resource_type: resource_type,
-      allowed_formats: ["jpg", "jpeg", "png", "pdf", "doc", "docx"],
       public_id: `${name}-${Date.now()}.${ext}`,
-      format: ext
     };
+
+    if (resource_type === "auto") {
+      params.allowed_formats = ["jpg", "jpeg", "png", "pdf", "doc", "docx"];
+      params.format = ext;
+    }
+
+    return params;
   },
 });
 
