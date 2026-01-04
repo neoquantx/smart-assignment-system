@@ -4,7 +4,7 @@ export const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
     const { name, email, bio, department, institution, courses } = req.body;
-    
+
     const updateData = {
       name,
       email,
@@ -15,7 +15,7 @@ export const updateProfile = async (req, res) => {
     };
 
     if (req.file) {
-      updateData.avatar = `/uploads/${req.file.filename}`;
+      updateData.avatar = req.file.path;
     }
 
     const updatedUser = await User.findByIdAndUpdate(

@@ -6,13 +6,11 @@ import { updateProfile, getProfile } from "../controllers/userController.js";
 import multer from "multer";
 import path from "path";
 
+import upload from "../middleware/uploadMiddleware.js";
+
 const router = express.Router();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) => cb(null, "avatar-" + Date.now() + path.extname(file.originalname))
-});
-const upload = multer({ storage });
+// Removed local diskStorage configuration
 
 // Get users by role
 router.get("/", authMiddleware, async (req, res) => {

@@ -12,15 +12,15 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// static uploads
+// static uploads - Commented out for Cloudinary migration
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // connect mongodb
 const MONGO = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/ams";
-mongoose.connect(MONGO).then(()=>console.log("MongoDB Connected")).catch(err=>{ console.error(err); process.exit(1); });
+mongoose.connect(MONGO).then(() => console.log("MongoDB Connected")).catch(err => { console.error(err); process.exit(1); });
 
 // routes
 import authRoutes from "./routes/authRoutes.js";
@@ -39,7 +39,7 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
 
-app.get("/api/ping", (req,res)=>res.json({ ok: true }));
+app.get("/api/ping", (req, res) => res.json({ ok: true }));
 
 // serve built frontend (dist) if present
 const distPath = path.join(__dirname, "../dist");
@@ -61,4 +61,4 @@ app.use((req, res, next) => {
 });
 
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, ()=> console.log(`Server running on PORT ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
