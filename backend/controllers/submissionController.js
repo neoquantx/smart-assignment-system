@@ -48,7 +48,17 @@ export const createSubmission = async (req, res) => {
       return res.status(400).json({ message: "The deadline for this assignment has passed. You can no longer submit." });
     }
 
+    console.log("📁 File upload debug:");
+    console.log("  - req.file exists:", !!req.file);
+    if (req.file) {
+      console.log("  - req.file.path:", req.file.path);
+      console.log("  - req.file.filename:", req.file.filename);
+      console.log("  - req.file.mimetype:", req.file.mimetype);
+    }
+
     const fileUrl = req.file ? req.file.path : "";
+    console.log("  - Final fileUrl being saved:", fileUrl);
+
     const sub = await Submission.create({ assignment: assignmentId, student: req.user._id, fileUrl });
     res.status(201).json(sub);
   } catch (err) {
